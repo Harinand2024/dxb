@@ -1,0 +1,492 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght
+    @100;200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font
+    -awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdY
+    TDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHU
+    SCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://kit.fontawesome.com/c451d80140.js" crossorigin="
+    anonymous"></script>
+    <title>Facebook Profile Page</title>
+    <style>
+        #previewContainer {
+            display: none;
+            margin-top: 10px;
+        }
+        #previewImage {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border: 1px solid #ccc;
+        }
+        .posted-content {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        .fixed-post-img {
+            width: 100%;          /* Full container width */
+            max-width: 500px;     /* Optional max width */
+            height: 300px;        /* Fixed height */
+            object-fit:fill;    /* Ensures image is cropped nicely */
+            border-radius: 10px;  /* Optional rounded corners */
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+            
+    <nav>
+        <div class="nav_left">
+            
+            <a href="{% url 'home' %}"  >
+                <img src="{% static 'images/logo.png' %}" alt="Logo" />
+
+            </a>
+            <ul>
+                <li><img src="{% static 'images/notification.png' %}" alt="notification"></li>
+                <li><img src="{% static 'images/inbox.png' %}" alt="inbox"></li>
+                <li><img src="{% static 'images/video.png' %}" alt="video"></li>
+            </ul>
+        </div>
+        <div class="nav_right">
+            <div class="search_box">
+                <img src="{% static 'images/search.png'%}" alt="search">
+                <input type="search" placeholder="Search">
+            </div>
+            <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
+                <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="profile">
+            </div>
+        </div>
+        <!-- todo: setting menu -->
+        <div class="setting_menu">
+            
+            <div id="dark_btn" class="dark_btn_on">
+                <span></span>
+            </div>
+
+            <div class="settings_menu_inner">
+                <div class="user_profile">
+                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <div>
+                        <p>{{ profile.username }}</p>
+                        <a href="{% url 'dashboard' %}">See Your Profile</a>
+                    </div>
+                </div>
+                <hr />
+                <div class="user_profile">
+                    <img src="{% static 'images/feedback.png' %}" alt="">
+                    <div>
+                        <p>Give Feedback</p>
+                        <a href="#">Help Us To improve  new design</a>
+                    </div>
+                </div>
+                <hr />
+                <div class="setting_link">
+                    <img src="{% static 'images/setting.png'%}" class="setting_icon" alt="">
+                    <a href="#">Setting & Privacy <img src="{% static 'images/arrow.png' %}" alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{% static 'images/help.png''%}" class="setting_icon" alt="">
+                    <a href="#">Help & Support <img src="{% static 'images/arrow.png' %} " alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{% static 'images/display.png'%}" class="setting_icon" alt="">
+                    <a href="#">Dispaly & Accesiblity <img src="{% static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{% static 'images/logout.png'%}" class="setting_icon" alt="">
+                    <a href="{% url 'logout' %}">Logout<img src="{% static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- todo: Profile Page -->
+    <div class="profile_container">
+        {% if profile.cover_picture %}
+            <img src="http://127.0.0.1:8001{{ profile.cover_picture }}" alt="cover" class="cover">
+        {% else %}
+            <img src="{% static 'images/cover.png' %}" alt="cover" class="cover">
+        {% endif %}
+    
+    <div class="profile_detail">
+        <div class="proflie_detail_left">
+            <div class="profile_row">
+                {% if profile.profile_picture %}
+                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="pd_image">
+                {% else %}
+                    <img src="{% static 'images/profile.png' %}" alt="Profile" class="pd_image">
+                {% endif %}
+
+                <div>
+                    <h3>{{ profile.username }}</h3>
+                    <p>{{ profile.friends|length }} Friends - 4 Mutual</p>
+                    <p>following:{{ profile.following_count|length }} </p>
+                    <p>followers:{{ profile.followers_count|length }} </p>
+                    {% for friend in profile.friends|slice:":4" %}
+                        <img src="{% static friend.image %}" alt="{{ friend.name }}">
+                    {% endfor %}
+                </div>
+                <button onclick="toggleEditForm()">Edit Profile</button>
+
+                <div id="edit-profile-form" style="display: none; margin-top: 1em;">
+                    <form id="profileForm">
+                        <input type="text" name="username" value="{{ profile.username }}" placeholder="Username"><br>
+                        <textarea name="bio" placeholder="Bio">{{ profile.bio }}</textarea><br>
+
+                        <!-- Profile Picture Upload + Preview -->
+                        <label>Profile Picture:</label><br>
+                        <input type="file" name="profile_picture" id="profilePictureInput"><br>
+                        <img id="profilePicturePreview" src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile Preview" style="height: 100px;"><br>
+
+                        <!-- Cover Picture Upload + Preview -->
+                        <label>Cover Picture:</label><br>
+                        <input type="file" name="cover_picture" id="coverPictureInput"><br>
+                        <img id="coverPicturePreview" src="http://127.0.0.1:8001{{ profile.cover_picture }}" alt="Cover Preview" style="height: 100px;"><br>
+
+                        <select name="visibility_status">
+                            <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
+                            <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
+                        </select><br>
+
+                        <button type="submit">Update</button>
+                    </form>
+
+                </div>
+            </div>
+            </div>
+            <div class="proflie_detail_right">
+                <button type="button"><img src="{% static 'images/add-friends.png'%}" alt="">Freinds</button>
+                <button type="button"><img src="{% static 'images/message.png'%}" alt="">Message</button>
+                <br />
+                <a href="#"><img src="{% static 'images/more.png'%}" alt=""></a>
+            </div>
+        </div>
+        <div class="profile_info">
+            <div class="info_col">
+                <div class="profile_intro">
+                    <h3>Intro</h3>
+                    <p class="intro_text">{{ profile.bio }}<img src="{% static 'images/feeling.png'%}" alt=""></p>
+                    <hr>
+                    
+                    <ul>
+                        {% for field in profile.profile_fields %}
+                            <li>
+                                <strong>{{ field.field_name }}:</strong>
+                                {% if field.field_type == 'text' %}
+                                    {{ field.text_value }}
+                                {% elif field.field_type == 'date' %}
+                                    {{ field.date_value }}
+                                {% elif field.field_type == 'image' %}
+                                    <img src="http://127.0.0.1:8001{{ field.image_value }}" alt="Image" style="height:50px;">
+                                {% elif field.field_type == 'file' %}
+                                    <a href="http://127.0.0.1:8001{{ field.file_value }}" target="_blank">Download</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Toggle Button -->
+                    <button onclick="toggleAddFieldForm()">+ Add New Field</button>
+
+                    <!-- Hidden Form -->
+                    <div id="addFieldForm" style="display: none; margin-top: 1em;">
+                        <h4>Add New Field</h4>
+                        <form method="POST" enctype="multipart/form-data" action="{% url 'add_profile_field' %}">
+                            {% csrf_token %}
+                            <input type="text" name="field_name" placeholder="Field Name" required><br>
+                            <select name="field_type" id="fieldType" onchange="toggleFieldInput()" required>
+                                <option value="">Select Type</option>
+                                <option value="text">Text</option>
+                                <option value="date">Date</option>
+                                <option value="image">Image</option>
+                                <option value="file">File</option>
+                            </select><br>
+
+                            <input type="text" name="text_value" id="textInput" placeholder="Enter Text" style="display:none;"><br>
+                            <input type="date" name="date_value" id="dateInput" style="display:none;"><br>
+                            <input type="file" name="image_value" id="imageInput" accept="image/*" style="display:none;"><br>
+                            <input type="file" name="file_value" id="fileInput" style="display:none;"><br>
+
+                            <button type="submit">Add Field</button>
+                        </form>
+                    </div>
+
+                    
+
+                    
+                </div>
+                <div class="profile_intro">
+                    <div class="title_box">
+                        <h3>Photos</h3>
+                        <a href="#">All Photos</a>
+                    </div>
+                    <div class="photo_box">
+                        {% for photo in photos %}
+                            <div><img src="{{ photo }}" alt=""></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="profile_intro">
+                    <div class="title_box">
+                        <h3>Friends</h3>
+                        <a href="#">All Friends</a>
+                    </div>
+                    <p>{{ friends|length }} (10 mutual)</p>
+                    <div class="freinds_box">
+                        {% for friend in friends %}
+                            <div>
+                                <img src="{{ friend.image }}" alt="">
+                                <p>{{ friend.name }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+            <div class="post_col">
+                <div class="post_container">
+                    <div class="user_profile">
+                        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile Picture">
+                        <div>
+                            <p>{{ profile.username }}</p>
+                            <small>Public <i class="fa fa-caret-down"></i></small>
+                        </div>  
+                    </div>
+                    <div class="post_input_container">
+                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                            <input type="text" name="title" placeholder="Title (optional)"><br>
+                            <textarea name="content" placeholder="What's on your mind?" required></textarea><br>
+                            <input type="text" name="caption" placeholder="Caption (optional)"><br>
+                            <input type="file" name="media_files" multiple><br>
+                            <button type="submit">Post</button>
+                        </form>
+                        <br>
+                        <div class="add_post_link">
+                            <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Live">Live Video</a>
+                            <a href="#"><img src="{% static 'images/photo.png' %}" alt="Photo">Photo/Video</a>
+                            <a href="#"><img src="{% static 'images/feeling.png' %}" alt="Feeling">Feeling/Activity</a>
+                        </div>
+                    </div>
+                </div>
+                {% for post in posts %}
+                    <div class="post_container">
+                        <div class="post_row">
+                            <div class="user_profile">
+                                <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Profile Picture">
+                                <div>
+                                    <p>{{ post.username }}</p>
+                                    <span>{{ post.created_at}}</span>
+                                    <span>{{ post.visibility}}</span>
+                                </div>
+                            </div>
+                            <a href="#"><i class="fa fa-ellipsis-v"></i></a>
+                        </div>
+
+                        {% if post.title %}
+                            <p class="post_text">{{ post.title }}</p>
+                        {% endif %}
+                        {% if post.caption %}
+                            <p class="post_text">{{ post.caption }}</p>
+                        {% endif %}
+
+                        {% if post.media %}
+                            {% for media_item in post.media %}
+                                {% if media_item.media_type == 'image' %}
+                                    <img src="http://127.0.0.1:8001{{ media_item.file }}" class="post_img fixed-post-img" alt="Post Image">
+                                {% elif media_item.media_type == 'video' %}
+                                    <video controls class="post_img fixed-post-img">
+                                        <source src="http://127.0.0.1:8001{{ media_item.file }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="post_row">
+                            <div class="activity_icon">
+                                <div><img src="{% static 'images/like-blue.png' %}" alt="Like"> {{ post.reaction_count }}</div>
+                                <div><img src="{% static 'images/comments.png' %}" alt="Comments"> {{ post.comment_count }}</div>
+                                <div><img src="{% static 'images/share.png' %}" alt="Share"> {{ post.share_count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+<!-- Your toggle/edit scripts -->
+<script>
+    function toggleEditForm() {
+        const form = document.getElementById('edit-profile-form');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const profileInput = document.getElementById('profilePictureInput');
+        const coverInput = document.getElementById('coverPictureInput');
+        const form = document.getElementById('profileForm');
+
+        function previewImage(inputElement, previewElementId) {
+            const file = inputElement.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById(previewElementId).src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        if (profileInput) {
+            profileInput.addEventListener('change', function () {
+                previewImage(this, 'profilePicturePreview');
+            });
+        }
+
+        if (coverInput) {
+            coverInput.addEventListener('change', function () {
+                previewImage(this, 'coverPicturePreview');
+            });
+        }
+
+        // 📨 Submit form using fetch
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            fetch(`http://127.0.0.1:8001/profile/profile/{{ profile.id }}/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer {{ request.session.access }}'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to update profile.');
+                return response.json();
+            })
+            .then(data => {
+                alert('Profile updated successfully!');
+                location.reload(); // Optionally reload the page to reflect changes
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Error updating profile.');
+            });
+        });
+    });
+</script>
+
+<script>
+    function toggleAddFieldForm() {
+        const form = document.getElementById('addFieldForm');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    }
+
+    function toggleFieldInput() {
+        document.getElementById('textInput').style.display = 'none';
+        document.getElementById('dateInput').style.display = 'none';
+        document.getElementById('imageInput').style.display = 'none';
+        document.getElementById('fileInput').style.display = 'none';
+
+        const selected = document.getElementById('fieldType').value;
+        if (selected === 'text') document.getElementById('textInput').style.display = 'block';
+        if (selected === 'date') document.getElementById('dateInput').style.display = 'block';
+        if (selected === 'image') document.getElementById('imageInput').style.display = 'block';
+        if (selected === 'file') document.getElementById('fileInput').style.display = 'block';
+    }
+</script>
+<script>
+    // Extract CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrfToken = getCookie("csrftoken");
+
+    // Preview image
+    document.getElementById("media_files").addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const previewImg = document.getElementById("previewImage");
+                previewImg.src = e.target.result;
+                document.getElementById("previewContainer").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Submit post
+    document.getElementById("postForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const response = await fetch("http://127.0.0.1:8001/media/posts/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Authorization": "Bearer {{ request.session.access }}"
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+        if (response.ok && result.status) {
+            alert("Post created successfully!");
+            form.reset();
+            document.getElementById("previewContainer").style.display = "none";
+
+            // Append new post
+            const post = result.data;
+            const postDiv = document.createElement("div");
+            postDiv.classList.add("posted-content");
+            postDiv.innerHTML = `
+                <h4>${post.title}</h4>
+                <p>${post.content}</p>
+                ${post.caption ? `<small><i>${post.caption}</i></small><br>` : ""}
+                ${post.media && post.media.length > 0 ? `<img src="${post.media[0].file}" style="width:300px;height:200px;object-fit:cover;">` : ""}
+            `;
+            document.getElementById("postedContentList").prepend(postDiv);
+        } else {
+            alert("Error posting content");
+        }
+    });
+</script>
+
+
+
+<script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

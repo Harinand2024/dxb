@@ -1,0 +1,146 @@
+{% load static %}
+{% load form_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Organization Signup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'dxb-style.css' %}">
+  
+  <style>
+    .login-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to right, #f8f9fa, #e0eafc);
+    }
+    .side-panel {
+      background-color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+    .login-logo {
+      width: 150px;
+      margin-bottom: 1rem;
+    }
+    .form-box {
+      width: 100%;
+      padding: 2rem;
+    }
+    .btn-dxbnews {
+      background-color: #212529;
+      color: white;
+      border: none;
+    }
+    .btn-dxbnews:hover {
+      background-color: #343a40;
+    }
+  </style>
+</head>
+<body>
+<div class="container login-section">
+  <div class="row g-0 shadow rounded overflow-hidden bg-white" style="max-width: 1000px; width: 100%;">
+    <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-center align-items-center side-panel">
+      <img src="https://www.dxbnewsnetwork.com/upload/logo/dxb_black.png" alt="Logo" class="login-logo">
+      <h4 class="fw-bold">Welcome to our community</h4>
+      <p class="text-muted">Join us and register your organization today.</p>
+    </div>
+
+    <div class="col-lg-6 col-12 d-flex align-items-center p-4">
+      <div class="form-box w-100">
+        <h3 class="fw-bold mb-3">Create an Account</h3>
+        <form method="post" id="registration-form">
+          {% csrf_token %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <div class="mb-3">
+            <label>Name</label>
+            {{ form.name|add_class:"form-control form-control-lg" }}
+          </div>
+
+          <div class="mb-3">
+            <label>Email</label>
+            <div class="input-group">
+              {{ form.email|add_class:"form-control form-control-lg" }}
+              <button type="button" class="btn btn-outline-secondary" onclick="sendOTP()">Send OTP</button>
+            </div>
+            <small id="otp-status" class="form-text text-muted"></small>
+          </div>
+
+          <div class="mb-3">
+            <label>Enter OTP</label>
+            {{ form.otp|add_class:"form-control form-control-lg" }}
+          </div>
+
+          <div class="mb-3">
+            <label>Password</label>
+            {{ form.password|add_class:"form-control form-control-lg" }}
+          </div>
+
+          <div class="mb-3">
+            <label>Confirm Password</label>
+            {{ form.confirm_password|add_class:"form-control form-control-lg" }}
+          </div>
+
+          <div class="mb-3">
+            <label>Phone Number</label>
+            {{ form.phone_number|add_class:"form-control form-control-lg" }}
+          </div>
+
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-dxbnews btn-lg">Sign Up</button>
+          </div>
+
+          <div class="text-center mt-3">
+            <small>Already have an account? <a href="{% url 'login' %}">Login</a></small>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function sendOTP() {
+    const emailInput = document.querySelector('input[name="email"]');
+    const email = emailInput.value;
+    const statusMsg = document.getElementById("otp-status");
+
+    if (!email) {
+      statusMsg.innerText = "Enter email to send OTP.";
+      statusMsg.style.color = "red";
+      return;
+    }
+
+    fetch("http://127.0.0.1:8001/organization/send-register-otp/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email: email })
+    })
+    .then(res => res.json().then(data => ({ status: res.status, data })))
+    .then(res => {
+      if (res.status === 201) {
+        statusMsg.innerText = "OTP sent successfully!";
+        statusMsg.style.color = "green";
+      } else {
+        statusMsg.innerText = res.data.message || "Failed to send OTP.";
+        statusMsg.style.color = "red";
+      }
+    })
+    .catch(() => {
+      statusMsg.innerText = "Error sending OTP.";
+      statusMsg.style.color = "red";
+    });
+  }
+</script>
+</body>
+</html>
