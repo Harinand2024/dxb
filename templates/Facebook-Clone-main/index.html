@@ -17,12 +17,116 @@
     <script src="https://kit.fontawesome.com/c451d80140.js" crossorigin="
     anonymous"></script>
     <title>Facebook</title>
+    <style>
+        .post_container {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .user_profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 5px;
+        }
+
+        .user_profile img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user_profile p {
+            margin: 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user_profile small {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .post_input_container form input[type="text"],
+        .post_input_container form textarea {
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            resize: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+
+        }
+
+        .post_input_container form textarea {
+            min-height: 80px;
+            
+            
+        }
+
+        .post_input_container form input[type="file"] {
+            margin: 10px 0;
+            padding: 10px 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .post_input_container form button {
+            background-color: #1877f2;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .post_input_container form button:hover {
+            background-color: #145dbf;
+        }
+
+        .add_post_link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .add_post_link a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .add_post_link a img {
+            width: 24px;
+            height: 24px;
+        }
+
+
+    </style>
 </head>
 <body>
             
     <nav>
         <div class="nav_left">
-            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+            <img src="https://www.dxbnewsnetwork.com/upload/logo/dxb_black.png" alt="Logo" />
             <ul>
                 <li><img src="{% static 'images/notification.png' %}" alt="notification"></li>
                 <li><img src="{% static 'images/inbox.png' %}" alt="inbox"></li>
@@ -35,7 +139,7 @@
                 <input type="search" placeholder="Search">
             </div>
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
-                <img src="{% static 'images/profile-pic.png' %}" alt="profile">
+                <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="profile">
             </div>
         </div>
         <!-- todo: setting menu -->
@@ -47,7 +151,7 @@
 
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
+                    <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
                     <div>
                         <p>Kashan Adnan</p>
                         <a href="{% url 'dashboard' %}">See Your Profile</a>
@@ -129,155 +233,81 @@
             </div>
             <div class="post_container">
                 <div class="user_profile">
-                    <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
+                    <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="Profile Picture">
                     <div>
-                        <p>Kashan Adnan</p>
+                        <p>{{ profile.username }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
-                    </div>
+                    </div> 
                 </div>
                 <div class="post_input_container">
-                    <input id="input_vlaue" placeholder="What's on Your Mind"/>
-                    <button id="button_value">Post</button>
-                    <div class="add_post_link">
-                        <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Its Video Time">Live Video</a>
-                        <a href="#"><img src="{% static 'images/photo.png' %}" alt="Its Video Time">Photo/Video</a>
-                        <a href="#"><img src="{% static 'images/feeling.png' %}" alt="Its Video Time">Feeling/Activity</a>
-                    </div>
-                </div>
-            </div>
-            <div id="post">
-                Post
-            </div>
-            <div class="post_container">
-                <div class="post_row">
-                    <div class="user_profile">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
-                        <div>
-                            <p>Kashan Adnan</p>
-                            <span>Sep 9 2022 , 12:50 Am</span>
+                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+                            <input type="text" name="title" placeholder="Title (optional)"><br>
+                            <textarea name="content" placeholder="What's on your mind?" required></textarea><br>
+                            <input type="text" name="caption" placeholder="Caption (optional)"><br>
+                            <input type="file" name="media_files" multiple><br>
+                            <button type="submit">Post</button>
+                        </form>
+                        <br>
+                        <div class="add_post_link">
+                            <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Live">Live Video</a>
+                            <a href="#"><img src="{% static 'images/photo.png' %}" alt="Photo">Photo/Video</a>
+                            <a href="#"><img src="{% static 'images/feeling.png' %}" alt="Feeling">Feeling/Activity</a>
                         </div>
                     </div>
-                    <a href=""><i class="fa fa-ellipsis-v"></i></a>
-                </div>
-                <p class="post_text">Subscribe <span> @Kashan Adnan </span>Youtube channel to Watch More VIdeos Website Devolopment And UI Design 
-                    <a href="#">#KashanAdnan</a><a href="#">#YoutubeChannel</a>
-                </p>
-                <img src="{% static 'images/feed-image-1.png' %}" alt="Feedback" class="post_img">
-                <div class="post_row">
-                    <div class="activity_icon">
-                        <div><img src="{% static 'images/like-blue.png' %}" alt="Like Kardo">120</div>
-                        <div><img src="{% static 'images/comments.png' %}" alt="Like Kardo">65</div>
-                        <div><img src="{% static 'images/share.png' %}" alt="Like Kardo">130</div>
-                    </div>
-                    <div class="post_profile_icon">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
-                    </div>
-                </div>
             </div>
-            <div class="post_container">
-                <div class="post_row">
-                    <div class="user_profile">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
-                        <div>
-                            <p>Izhan Farhan</p>
-                            <span>Sep 9 2022 , 11:09 Am</span>
+
+            {% for post in posts %}
+                <div class="post_container">
+                    <div class="post_row">
+                        <div class="user_profile">
+                            <img src="{{ post.profile_picture }}" alt="Profile Picture">
+                            <div>
+                                <p>{{ post.username }}</p>
+                                <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
+                            </div>
+                        </div>
+                        <a href="#"><i class="fa fa-ellipsis-v"></i></a>
+                    </div>
+
+                    {% if post.title %}
+                        <p class="post_text">{{ post.title }}</p>
+                    {% endif %}
+                    {% if post.caption %}
+                        <p class="post_text">{{ post.caption }}</p>
+                    {% endif %}
+                    {% if post.content %}
+                        <p class="post_text">{{ post.content }}</p>
+                    {% endif %}
+
+                    {% for media_item in post.media %}
+                        {% with media_item|lower as f %}
+                            {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+                                <img src="{{ media_item }}" class="post_img" alt="Post Image">
+                            {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                                <video controls class="post_img">
+                                    <source src="{{ media_item }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+
+                    <div class="post_row">
+                        <div class="activity_icon">
+                            <div><img src="{% static 'images/like-blue.png' %}" alt="Like"> {{ post.reaction_count }}</div>
+                            <div><img src="{% static 'images/comments.png' %}" alt="Comments"> {{ post.comment_count }}</div>
+                            <div><img src="{% static 'images/share.png' %}" alt="Share"> {{ post.share_count }}</div>
+                        </div>
+                        <div class="post_profile_icon">
+                            <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
                         </div>
                     </div>
-                    <a href=""><i class="fa fa-ellipsis-v"></i></a>
                 </div>
-                <p class="post_text">Subscribe <span> @Izhan Farhan </span>Youtube channel to Watch More Videos Graphic desing And UI Design 
-                    <a href="#">#Izhan Farhan</a><a href="#">#YoutubeChannel</a>
-                </p>
-                <img src="{% static 'images/feed-image-2.png' %}" alt="Feedback" class="post_img">
-                <div class="post_row">
-                    <div class="activity_icon">
-                        <div><img src="{% static 'images/like-blue.png' %}" alt="Like Kardo">290</div>
-                        <div><img src="{% static 'images/comments.png' %}" alt="Like Kardo">98</div>
-                        <div><img src="{% static 'images/share.png' %}" alt="Like Kardo">9834</div>
-                    </div>
-                    <div class="post_profile_icon">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="post_container">
-                <div class="post_row">
-                    <div class="user_profile">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
-                        <div>
-                            <p>Kamran Sheikh</p>
-                            <span>Sep 9 2022 , 12:00 Am</span>
-                        </div>
-                    </div>
-                    <a href=""><i class="fa fa-ellipsis-v"></i></a>
-                </div>
-                <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
-                    <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
-                </p>
-                <img src="{% static 'images/feed-image-3.png' %}" alt="Feedback" class="post_img">
-                <div class="post_row">
-                    <div class="activity_icon">
-                        <div><img src="{% static 'images/like-blue.png' %}" alt="Like Kardo">880</div>
-                        <div><img src="{% static 'images/comments.png' %}" alt="Like Kardo">56</div>
-                        <div><img src="{% static 'images/share.png' %}" alt="Like Kardo">510</div>
-                    </div>
-                    <div class="post_profile_icon">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="post_container">
-                <div class="post_row">
-                    <div class="user_profile">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
-                        <div>
-                            <p>Kamran Sheikh</p>
-                            <span>Sep 9 2022 , 12:00 Am</span>
-                        </div>
-                    </div>
-                    <a href=""><i class="fa fa-ellipsis-v"></i></a>
-                </div>
-                <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
-                    <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
-                </p>
-                <img src="{% static 'images/feed-image-4.png' %}" alt="Feedback" class="post_img">
-                <div class="post_row">
-                    <div class="activity_icon">
-                        <div><img src="{% static 'images/like-blue.png' %}" alt="Like Kardo">880</div>
-                        <div><img src="{% static 'images/comments.png' %}" alt="Like Kardo">56</div>
-                        <div><img src="{% static 'images/share.png' %}" alt="Like Kardo">510</div>
-                    </div>
-                    <div class="post_profile_icon">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="post_container">
-                <div class="post_row">
-                    <div class="user_profile">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Pro We Are Pro You Now">
-                        <div>
-                            <p>Kamran Sheikh</p>
-                            <span>Sep 9 2022 , 12:00 Am</span>
-                        </div>
-                    </div>
-                    <a href=""><i class="fa fa-ellipsis-v"></i></a>
-                </div>
-                <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
-                    <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
-                </p>
-                <img src="{% static 'images/feed-image-5.png' %}" alt="Feedback" class="post_img">
-                <div class="post_row">
-                    <div class="activity_icon">
-                        <div><img src="{% static 'images/like.png' %}" alt="Like Kardo">880</div>
-                        <div><img src="{% static 'images/comments.png' %}" alt="Like Kardo">56</div>
-                        <div><img src="{% static 'images/share.png' %}" alt="Like Kardo">510</div>
-                    </div>
-                    <div class="post_profile_icon">
-                        <img src="{% static 'images/profile-pic.png' %}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
+
+
             <button type="button" class="our_btn">Load More</button>
                     <footer>
                             <p>Copyright 2022 - Easy Tutorial  Youtube Channel</p>

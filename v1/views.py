@@ -9,10 +9,45 @@ from django.views.decorators.csrf import csrf_protect
 # Create your views here.
 
 def home(request):
-    if request.session.get('access'):
-        return render(request, 'Facebook-Clone-main/index.html', {'access': request.session.get('access')})
-    else:
+    if not request.session.get('access'):
         return redirect('login')
+    access_token = request.session.get('access')
+    profile_id = request.session.get('profile_id')
+
+    if not profile_id:
+        messages.error(request, "Profile ID not found.")
+        return redirect('login')
+    access_token = request.session.get('access')
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get('http://127.0.0.1:8001/media/all-posts/', headers=headers)
+
+    posts = []
+    if response.status_code == 200:
+        posts = response.json().get('data', [])
+        for post in posts:
+            # Fix media file URLs
+            post['media'] = [
+                f"http://127.0.0.1:8001{m['file']}" for m in post.get('media', [])
+            ]
+            # Fix profile picture URL
+            if post.get('profile_picture'):
+                post['profile_picture'] = f"http://127.0.0.1:8001/media/{post['profile_picture']}"
+            else:
+                post['profile_picture'] = '/static/images/profile_picture.png'
+    profile_data = {}
+    try:
+        profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
+        profile_response = requests.get(profile_url, headers=headers)
+        if profile_response.status_code == 200:
+            profile_data = profile_response.json().get('data', {})
+        else:
+            messages.error(request, "Failed to fetch profile data.")
+    except Exception as e:
+        print("Profile fetch error:", str(e))
+        messages.error(request, "Error occurred while fetching profile.")
+
+    return render(request, 'Facebook-Clone-main/index.html', {'posts': posts, 'profile': profile_data})
+
 
 
 def login_page_view(request):
@@ -104,18 +139,18 @@ def dashboard_view(request):
     # ✅ Fetch actual posts from API
     posts = []
     try:
-        posts_url = 'http://127.0.0.1:8001/media/all-posts/'
+        posts_url = f'http://127.0.0.1:8001/media/profile-posts/profile-id/{profile_id}/'  # ← use f-string here
         posts_response = requests.get(posts_url, headers=headers)
         if posts_response.status_code == 200:
             posts_data = posts_response.json().get('data', [])
             for post in posts_data:
                 posts.append({
                     "username": post.get('username'),
-                    "profile_picture": profile_data['profile_picture'],
+                    "profile_picture": profile_data.get('profile_picture', ''),
                     "created_at": post.get('created_at'),
                     "title": post.get('title'),
                     "caption": post.get('caption'),
-                    "media": post.get('media', []),
+                    "media": [f"http://127.0.0.1:8001{m.get('file')}" for m in post.get('media', [])],  # Media URLs
                     "reaction_count": post.get('reaction_count', 0),
                     "comment_count": post.get('comment_count', 0),
                     "share_count": post.get('share_count', 0),
@@ -126,35 +161,29 @@ def dashboard_view(request):
         print("Post fetch error:", str(e))
         messages.error(request, "Error occurred while fetching posts.")
 
-    # Sample photos
-    photos = [
-        '/static/images/photo1.png',
-        '/static/images/photo2.png',
-        '/static/images/photo3.png',
-        '/static/images/photo4.png',
-        '/static/images/photo5.png',
-        '/static/images/photo6.png',
-    ]
+    photos = []
+    try:
+        photos_url = f'http://127.0.0.1:8001/media/profile-images/profile-id/{profile_id}/'
+        photos_response = requests.get(photos_url, headers=headers)
+        if photos_response.status_code == 200:
+            photos_data = photos_response.json().get('data', [])
+            for item in photos_data:
+                file_url = item.get('file')
+                if file_url:
+                    photos.append(f"http://127.0.0.1:8001{file_url}")
+        else:
+            print("Photo fetch failed:", photos_response.status_code)
+    except Exception as e:
+        print("Photo fetch error:", str(e))
 
-    # Sample friends
-    friends = [
-        {'name': 'Adnan Y', 'image': '/static/images/member-1.png'},
-        {'name': 'Izhan F', 'image': '/static/images/member-2.png'},
-        {'name': 'Kamran S', 'image': '/static/images/member-3.png'},
-        {'name': 'Sameer K', 'image': '/static/images/member-4.png'},
-        {'name': 'Fatiama A', 'image': '/static/images/member-5.png'},
-        {'name': 'Arham Ar', 'image': '/static/images/member-6.png'},
-        {'name': 'Kamil Y', 'image': '/static/images/member-7.png'},
-        {'name': 'Amir Y', 'image': '/static/images/member-8.png'},
-        {'name': 'Kashan A', 'image': '/static/images/member-9.png'},
-    ]
+
+
 
     return render(request, 'Facebook-Clone-main/user.html', {
         'profile': profile_data,
         'username': request.session.get('username'),
         'email': request.session.get('email'),
         'photos': photos,
-        'friends': friends,
         'posts': posts,
     })
 
@@ -254,3 +283,9 @@ def create_post_view(request):
         return redirect('dashboard')  # or wherever the posts appear
 
     return redirect('dashboard')
+
+def forgot_password_view(request):
+    return render(request, 'Facebook-Clone-main/forgot_password.html')
+
+def reset_password_page(request):
+    return render(request, 'Facebook-Clone-main/reset_password.html')

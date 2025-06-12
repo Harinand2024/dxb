@@ -848,3 +848,287 @@ footer {
     border-radius: 10px;
     margin-top: -7px;
 }
+
+    #previewContainer {
+        display: none;
+        margin-top: 10px;
+    }
+    #previewImage {
+        width: 300px;
+        height: 200px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+    }
+    .posted-content {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    .fixed-post-img {
+        width: 100%;          /* Full container width */
+        max-width: 500px;     /* Optional max width */
+        height: 300px;        /* Fixed height */
+        object-fit:fill;    /* Ensures image is cropped nicely */
+        border-radius: 10px;  /* Optional rounded corners */
+        margin-top: 10px;
+    }
+    .post_col {
+        max-width: 600px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+    }
+
+    .post_container {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .user_profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .user_profile img {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+
+    .user_profile p {
+        margin: 0;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .user_profile small,
+    .user_profile span {
+        font-size: 12px;
+        color: #777;
+        display: block;
+    }
+
+    .post_input_container input[type="text"],
+    .post_input_container textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .post_input_container input[type="file"] {
+        margin-bottom: 10px;
+    }
+
+    .post_input_container button {
+        padding: 8px 16px;
+        background-color: #1877f2;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .post_input_container button:hover {
+        background-color: #155bcb;
+    }
+
+    .add_post_link {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+
+    .add_post_link a {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #555;
+        text-decoration: none;
+    }
+
+    .add_post_link img {
+        width: 20px;
+        margin-right: 6px;
+    }
+
+    .post_text {
+        margin: 10px 0;
+        font-size: 15px;
+    }
+
+    .post_img.fixed-post-img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+
+    .post_row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+    }
+
+    .activity_icon {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .activity_icon div {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .activity_icon img {
+        width: 18px;
+        margin-right: 6px;
+    }
+
+    /* Profile Page Styles */
+        .edit-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 1em 0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2em;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+form input[type="text"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1em;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+form img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 1em;
+}
+
+.submit-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 0.6em 1.2em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+.submit-btn:hover {
+    background-color: #218838;
+}
+.btn-icon {
+display: inline-flex;
+align-items: center;
+gap: 0.5rem;
+background-color: #007bff;
+color: white;
+padding: 0.5rem 1rem;
+font-size: 1rem;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
+
+.btn-icon:hover {
+background-color: #0056b3;
+}
+
+.btn-icon .plus-icon {
+display: inline-block;
+width: 12px;
+height: 12px;
+position: relative;
+}
+
+.btn-icon .plus-icon::before,
+.btn-icon .plus-icon::after {
+content: '';
+position: absolute;
+background-color: white;
+}
+
+.btn-icon .plus-icon::before {
+width: 100%;
+height: 2px;
+top: 50%;
+left: 0;
+transform: translateY(-50%);
+}
+
+.btn-icon .plus-icon::after {
+width: 2px;
+height: 100%;
+top: 0;
+left: 50%;
+transform: translateX(-50%);
+}
+
+
