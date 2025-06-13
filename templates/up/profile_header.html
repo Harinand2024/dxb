@@ -1,0 +1,21 @@
+<!-- up/profile_header.html -->
+{% load static %}
+<div class="profile-header d-flex align-items-center justify-content-between p-3 border-bottom bg-white">
+    <div class="d-flex align-items-center">
+        <img src="{% if profile.profile_picture %}http://127.0.0.1:8001{{ profile.profile_picture }}{% else %}{% static 'images/profile.png.png' %}{% endif %}" 
+             alt="Profile Picture"
+             class="rounded-circle me-3"
+             style="width: 100px; height: 100px; object-fit: cover; border: 2px solid #ddd;">
+        <div>
+            <h4 class="mb-1">{{ profile.username }}</h4>
+            {% if profile.bio %}
+                <p class="text-muted mb-0">{{ profile.bio }}</p>
+            {% endif %}
+        </div>
+    </div>
+    <div>
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            Edit Profile
+        </button>
+    </div>
+</div>

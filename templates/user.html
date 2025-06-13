@@ -13,17 +13,20 @@
     -awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdY
     TDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHU
     SCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://kit.fontawesome.com/c451d80140.js" crossorigin="
-    anonymous"></script>
+    <script src="https://kit.fontawesome.com/c451d80140.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Optional: Font Awesome for pencil icon -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Facebook Profile Page</title>
 </head>
 <style>
+    :focus-visible {
+        outline: none !important;
+    }
     .cover-wrapper {
       position: relative;
       display: inline-block;
@@ -35,7 +38,7 @@
       object-fit: cover;
     }
 
-    .edit-icon {
+    .edit-icon-top {
          position: absolute;
         bottom: 30px;
         right: 10px;
@@ -46,9 +49,10 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         width: 40px;
         height: 40px;
+        font-size: 16px;
     }
 
-    .edit-icon:hover {
+    .edit-icon-top:hover {
       background: #f0f0f0;
     }
     .textarea{
@@ -57,28 +61,99 @@
         border: 1px solid #ddd;
         padding: 10px;
     }
-    
+    .editable:hover {
+        cursor: pointer;
+        background-color: #f0f0f0;
+    }
+    .edit-icon {
+        float: right;
+        cursor: pointer;
+        color: gray;
+        font-size: 16px;
+        margin-top: 8px;
+    }
+    .edit-icon:hover {
+        color: black;
+    }
+    .introFieldsList{
+        padding: 0px;
+    }
+    .profile-detail-actions .btn {
+    font-weight: 500;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background-color: #f0f2f5;
+    border: none;
+    transition: background-color 0.3s;
+    }
+
+    .profile-detail-actions .btn:hover {
+    background-color: #e4e6eb;
+    }
+.pd_image {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: cover;
+  border-radius: 6px !important;
+  display: block;
+}
+
+.profile-img-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.camera-icon {
+      position: absolute;
+    bottom: 3px;
+    right: 21px;
+    background-color: #f0f2f5;
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: 4px 5px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 30px;
+    height: 30px;
+}
+
+.camera-icon:hover {
+  background-color: #e4e6eb;
+}
+
+
+
   </style>
 <body>
             
     <nav>
         <div class="nav_left">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+            <a href="./index.html">
+                <img src="images/logo.png" alt="Logo" class="logo">
             </a>
-            <ul>
-                <li><img src="{% static 'images/notification.png' %}" alt="notification"></li>
-                <li><img src="{% static 'images/inbox.png' %}" alt="inbox"></li>
-                <li><img src="{% static 'images/video.png' %}" alt="video"></li>
+            <ul class="icon-list d-flex list-unstyled mb-0">
+            <li class="me-3">
+                <i class="fas fa-bell" title="Notifications"></i>
+            </li>
+            <li class="me-3">
+                <i class="fas fa-envelope" title="Inbox"></i>
+            </li>
+            <li>
+                <i class="fas fa-video" title="Videos"></i>
+            </li>
             </ul>
+
         </div>
         <div class="nav_right">
             <div class="search_box">
-                <img src="{% static 'images/search.png'%}" alt="search">
+                <img src="images/search.png" alt="search">
                 <input type="search" placeholder="Search">
             </div>
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
-                <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="profile">
+                <img src="images/profile-pic.png" alt="profile">
             </div>
         </div>
         <!-- todo: setting menu -->
@@ -90,15 +165,15 @@
 
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="images/profile-pic.png" alt="Pro We Are Pro You Now">
                     <div>
-                        <p>{{ profile.username }}</p>
-                        <a href="{% url 'dashboard' %}">See Your Profile</a>
+                        <p>Kashan Adnan</p>
+                        <a href="#">See Your Profile</a>
                     </div>
                 </div>
                 <hr />
                 <div class="user_profile">
-                    <img src="{% static 'images/feedback.png' %}" alt="">
+                    <img src="images/feedback.png" alt="">
                     <div>
                         <p>Give Feedback</p>
                         <a href="#">Help Us To improve  new design</a>
@@ -106,16 +181,16 @@
                 </div>
                 <hr />
                 <div class="setting_link">
-                    <img src="{% static 'images/setting.png'%}" class="setting_icon" alt="">
-                    <a href="#">Setting & Privacy <img src="{% static 'images/arrow.png' %}" alt="" width="10px"></a>
+                    <img src="images/setting.png" class="setting_icon" alt="">
+                    <a href="#">Setting & Privacy <img src="images/arrow.png" alt="" width="10px"></a>
                 </div>
                 <div class="setting_link">
-                    <img src="{% static 'images/help.png''%}" class="setting_icon" alt="">
-                    <a href="#">Help & Support <img src="{% static 'images/arrow.png' %} " alt="" width="10px"></a>
+                    <img src="images/help.png" class="setting_icon" alt="">
+                    <a href="#">Help & Support <img src="images/arrow.png" alt="" width="10px"></a>
                 </div>
                 <div class="setting_link">
-                    <img src="{% static 'images/display.png'%}" class="setting_icon" alt="">
-                    <a href="#">Dispaly & Accesiblity <img src="{% static 'images/arrow.png'%}" alt="" width="10px"></a>
+                    <img src="images/display.png" class="setting_icon" alt="">
+                    <a href="#">Dispaly & Accesiblity <img src="images/arrow.png" alt="" width="10px"></a>
                 </div>
                 <div class="setting_link">
                     <img src="images/logout.png" class="setting_icon" alt="">
@@ -127,12 +202,26 @@
     
     <!-- todo: Profile Page -->
     <div class="profile_container">
-            <div class="container mt-4">
-                <div class="cover-wrapper position-relative">
+            <div class="container m-0 p-0">
+                <div class="cover-wrapper position-relative w-100">
                     <img id="coverImage" src="images/cover.png" alt="cover" class="img-fluid" style="max-height: 300px; object-fit: cover; width: 100%;">
-                    <div class="edit-icon" data-bs-toggle="modal" data-bs-target="#editModal" style="cursor:pointer;">
-                    <i class="fas fa-pencil-alt"></i>
+                   
+                    <div class="position-absolute text-end me-3 mt-2" style="right: 20px; bottom:20px">
+                    <!-- Edit Button with Dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light d-flex align-items-center gap-1 px-3 py-1 rounded-pill shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-camera"></i> Edit cover photo
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end mt-2 shadow-sm">
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#"><i class="fas fa-images"></i> Choose cover photo</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#editModal" style="cursor:pointer;"><i class="fas fa-upload"></i> Upload photo</a></li>
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="#"><i class="fas fa-arrows-alt"></i> Reposition</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="#"><i class="fas fa-trash"></i> Remove</a></li>
+                        </ul>
                     </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -152,7 +241,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button id="cropButton" class="btn btn-primary">Crop & Save</button>
+                        <button id="cropButton" class="btn btn-primary-art">Crop & Save</button>
                     </div>
                     </div>
                 </div>
@@ -162,13 +251,27 @@
         <div class="profile_detail">
             <div class="proflie_detail_left">
                 <div class="profile_row">
-                    <img src="images/profile.png" alt="Profile" class="pd_image">
+                    <div class="profile-img-wrapper position-relative d-inline-block">
+                        <img src="images/profile.png" alt="Profile" class="pd_image">
+                        <div class="camera-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        </div>
+
                     <div>
+                        <!-- Display Name Section -->
                         <h3 id="displayName" style="cursor:pointer;">
-                            Kashan Adnan
-                            <i class="fas fa-pencil-alt ms-2 text-muted"></i>
+                        <span id="nameText">Kashan Adnan</span>
+                        <i class="fas fa-pencil-alt edit-icon ms-2 text-muted" onclick="enableEdit()"></i>
                         </h3>
-                        <input type="text" id="editNameInput" class="form-control d-none" />
+
+                        <input
+                        type="text"
+                        id="editNameInput"
+                        class="form-control d-none"
+                        onblur="saveName()"
+                        onkeydown="if(event.key === 'Enter') saveName()"
+                        />
                         <p>120 Freinds  - 398 Mutal</p>
                         <img src="images/member-1.png" alt="">
                         <img src="images/member-2.png" alt="">
@@ -177,31 +280,112 @@
                     </div>
                 </div>
             </div>
-            <div class="proflie_detail_right">
-                <button type="button"><img src="images/add-friends.png" alt="">Freinds</button>
-                <button type="button"><img src="images/message.png" alt="">Message</button>
-                <br />
-                <a href="#"><img src="images/more.png" alt=""></a>
-            </div>
-        </div>
-        <div class="profile_info">
-            <div class="info_col">
-                <div class="profile_intro">
-                    <h3>Intro</h3>
-                    <p class="intro_text">Beileive in yourself and you can do unbelievible things. <img src="images/feeling.png" alt=""></p>
-                    <hr>
-                    <ul>
-                        <li> <img src="images/profile-job.png" alt=""> Director at 99media ltd</li>
-                        <li> <img src="images/profile-study.png" alt=""> Studied at Amity University</li>
-                        <li> <img src="images/profile-study.png" alt=""> Went to DPS Delhi</li>
-                        <li> <img src="images/profile-home.png" alt=""> Lives in Karachi ,pakistan</li>
-                        <li> <img src="images/profile-location.png" alt=""> From Karachi, Pakistan</li>
+
+                <div class="profile-detail-actions d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" class="btn btn-light d-flex align-items-center rounded-pill">
+                    <i class="fas fa-user-edit me-2"></i> Edit Profile
+                </button>
+
+                <button type="button" class="btn btn-primary-art d-flex align-items-center rounded-pill">
+                    <i class="fas fa-user-plus me-2"></i> Friends
+                </button>
+
+                <button type="button" class="btn btn-primary-art d-flex align-items-center rounded-pill">
+                    <i class="fas fa-envelope me-2"></i> Message
+                </button>
+
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Block</a></li>
+                    <li><a class="dropdown-item" href="#">Report</a></li>
+                    <li><a class="dropdown-item" href="#">Unfollow</a></li>
                     </ul>
                 </div>
+                </div>
+
+        </div>
+        
+        <div class="profile_info">
+            <div class="info_col">
+                
+                <div id="introContainer">
+                    <div class="profile_intro border rounded p-3 mb-3">
+                        <h3 contenteditable="true"  class="mb-3">
+                        <i class="fas fa-user-edit edit-icon me-2"></i>Intro
+                        </h3>
+
+                        <p class="intro_text mb-3 ">
+                        <span contenteditable="true">
+                            Believe in yourself and you can do unbelievable things.
+                        </span>
+                        <img src="images/feeling.png" alt="Feeling Icon"  />
+                        </p>
+
+                        <hr />
+
+                        <ul class="introFieldsList list-unstyled">
+                        <li class="d-flex align-items-center mb-2">
+                            <img src="images/profile-job.png" alt="Job" class="me-2"  />
+                            <span contenteditable="true" class="flex-grow-1">
+                            Director at 99media ltd
+                            </span>
+                            <button
+                            class="btn btn-sm  ms-2"
+                            onclick="removeIntroField(this)"
+                            title="Delete"
+                            >
+                            <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </li>
+
+                        <li class="d-flex align-items-center mb-2">
+                            <img src="images/profile-study.png" alt="Study" class="me-2"  />
+                            <span contenteditable="true" class="flex-grow-1">
+                            Studied at Amity University
+                            </span>
+                            <button
+                            class="btn btn-sm  ms-2"
+                            onclick="removeIntroField(this)"
+                            title="Delete"
+                            >
+                            <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </li>
+                        </ul>
+
+                        <!-- Add New Field -->
+                        <div class="d-flex mt-3">
+                        <input
+                            type="text"
+                            class="form-control me-2 newFieldInput"
+                            placeholder="Add custom intro line..."
+                        />
+                        <button
+                            class="btn btn-outline-primary-art "
+                            onclick="addIntroField(this)"
+                            title="Add Field"
+                        >
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Add Section Button -->
+                    <div class="text-center">
+                    <button class="btn btn-primary-art w-100 mb-3" onclick="addNewIntroSection()">
+                        <i class="fas fa-plus"></i> Add More Sections
+                    </button>
+                    </div>
+
+
                 <div class="profile_intro">
                     <div class="title_box">
                         <h3>Photos</h3>
-                        <a href="">All Photos</a>
+                        <a href="gallery-new.html">All Photos</a>
                     </div>
                     <div class="photo_box">
                         <div><img src="images/photo1.png" alt=""></div> 
@@ -216,7 +400,7 @@
                 <div class="profile_intro">
                     <div class="title_box">
                         <h3>Freinds</h3>
-                        <a href="">All Freinds</a>
+                        <a href="allfriends-new.html">All Freinds</a>
                     </div>
                     <p>120 (10 mutal)</p>
                     <div class="freinds_box">
@@ -260,7 +444,15 @@
                                 <span>Sep 9 2022 , 12:50 Am</span>
                             </div>
                         </div>
-                        <a href=""><i class="fa fa-ellipsis-v"></i></a>
+                        <div class="dropdown text-end   ">
+                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <p class="post_text">Subscribe <span> @Kashan Adnan </span>Youtube channel to Watch More VIdeos Website Devolopment And UI Design 
                         <a href="#">#KashanAdnan</a><a href="#">#YoutubeChannel</a>
@@ -286,7 +478,15 @@
                                 <span>Sep 9 2022 , 11:09 Am</span>
                             </div>
                         </div>
-                        <a href=""><i class="fa fa-ellipsis-v"></i></a>
+                        <div class="dropdown text-end   ">
+                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <p class="post_text">Subscribe <span> @Izhan Farhan </span>Youtube channel to Watch More Videos Graphic desing And UI Design 
                         <a href="#">#Izhan Farhan</a><a href="#">#YoutubeChannel</a>
@@ -312,7 +512,15 @@
                                 <span>Sep 9 2022 , 12:00 Am</span>
                             </div>
                         </div>
-                        <a href=""><i class="fa fa-ellipsis-v"></i></a>
+                       <div class="dropdown text-end   ">
+                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
                         <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
@@ -338,7 +546,15 @@
                                 <span>Sep 9 2022 , 12:00 Am</span>
                             </div>
                         </div>
-                        <a href=""><i class="fa fa-ellipsis-v"></i></a>
+                        <div class="dropdown text-end   ">
+                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
                         <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
@@ -364,7 +580,15 @@
                                 <span>Sep 9 2022 , 12:00 Am</span>
                             </div>
                         </div>
-                        <a href=""><i class="fa fa-ellipsis-v"></i></a>
+                        <div class="dropdown text-end   ">
+                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <p class="post_text">Subscribe <span> @KamranSheikh </span>Youtube channel to Watch More VIdeos Microsoft  And Photo Editing 
                         <a href="#">#KamranSheikh</a><a href="#">#YoutubeChannel</a>
@@ -387,77 +611,33 @@
 
 
 <script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <!-- Cropper JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 <script>
-  let cropper;
-  const uploadInput = document.getElementById('uploadInput');
-  const imagePreview = document.getElementById('imagePreview');
-  const coverImage = document.getElementById('coverImage');
+  function enableEdit() {
+    const display = document.getElementById("displayName");
+    const input = document.getElementById("editNameInput");
+    const nameText = document.getElementById("nameText");
 
-  uploadInput.addEventListener('change', function (e) {
-    const file = e.target.files[0];
-    if (file && /^image\//.test(file.type)) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        imagePreview.src = reader.result;
-        imagePreview.style.display = 'block';
-        if (cropper) cropper.destroy(); // destroy old if exists
-        cropper = new Cropper(imagePreview, {
-          aspectRatio: 16 / 9,
-          viewMode: 1,
-          responsive: true,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  document.getElementById('cropButton').addEventListener('click', function () {
-    if (cropper) {
-      const canvas = cropper.getCroppedCanvas({ width: 1200, height: 675 });
-      coverImage.src = canvas.toDataURL(); // display the cropped image
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-      modal.hide(); // close modal
-    }
-  });
-</script>
-
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-<script> const displayName = document.getElementById('displayName');
-  const editInput = document.getElementById('editNameInput');
-
-  // Set initial value
-  editInput.value = displayName.innerText.trim();
-
-  // Toggle to input on click
-  displayName.addEventListener('click', () => {
-    editInput.classList.remove('d-none');
-    displayName.classList.add('d-none');
-    editInput.value = displayName.innerText.trim();
-    editInput.focus();
-  
- });
-
-  // Save name on blur or Enter
-  editInput.addEventListener('blur', saveName);
-  editInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      saveName();
-    }
-  });
+    input.value = nameText.textContent.trim();
+    display.classList.add("d-none");
+    input.classList.remove("d-none");
+    input.focus();
+  }
 
   function saveName() {
-    const newName = editInput.value.trim();
-    if (newName) {
-      displayName.innerHTML = `${newName} <i class="fas fa-pencil-alt ms-2 text-muted"></i>`;
+    const display = document.getElementById("displayName");
+    const input = document.getElementById("editNameInput");
+    const nameText = document.getElementById("nameText");
+
+    if (input.value.trim()) {
+      nameText.textContent = input.value.trim();
     }
-    editInput.classList.add('d-none');
-    displayName.classList.remove('d-none');
+
+    display.classList.remove("d-none");
+    input.classList.add("d-none");
   }
 </script>
 

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block container %}
+<div class="profile_container d-flex justify-content-between">
+
+  <!-- Left Detail Section -->
+  <div class="proflie_detail_left">
+    <div class="profile_row">
+
+      <!-- Profile Image -->
+      {% if profile.profile_picture %}
+        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="pd_image">
+      {% else %}
+        <img src="{% static 'images/profile.png' %}" alt="Profile" class="pd_image">
+      {% endif %}
+
+      <div>
+        <h3>
+          {{ profile.username }}
+          <i class="fas fa-pencil-alt text-muted" onclick="toggleEditForm()" style="cursor:pointer;"></i>
+        </h3>
+        <p>{{ profile.friends|length }} Friends</p>
+        <p>Following: {{ profile.following_count|length }}</p>
+        <p>Followers: {{ profile.followers_count|length }}</p>
+
+        <!-- Display first 4 friends -->
+        {% for friend in profile.friends|slice:":4" %}
+          <img src="{% static friend.image %}" alt="{{ friend.name }}" style="height:30px;width:30px;border-radius:50%;">
+        {% endfor %}
+      </div>
+
+      <hr>
+      <button onclick="toggleEditForm()" class="edit-btn">Edit Profile</button>
+    </div>
+
+    <!-- Edit Form Modal -->
+    <div id="edit-profile-form" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleEditForm()">&times;</span>
+        <h2>Edit Profile</h2>
+        <form id="profileForm">
+          <input type="text" name="username" value="{{ profile.username }}" placeholder="Username"><br>
+
+          <textarea name="bio" placeholder="Bio">{{ profile.bio }}</textarea><br>
+
+          <label>Profile Picture:</label><br>
+          <input type="file" name="profile_picture" id="profilePictureInput"><br>
+          <img id="profilePicturePreview" src="http://127.0.0.1:8001{{ profile.profile_picture }}" style="height: 50px;width: 50px;"><br>
+
+          <label>Cover Picture:</label><br>
+          <input type="file" name="cover_picture" id="coverPictureInput"><br>
+          <img id="coverPicturePreview" src="http://127.0.0.1:8001{{ profile.cover_picture }}" style="height: 50px;width: 50px;"><br>
+
+          <label>Visibility:</label><br>
+          <select name="visibility_status">
+            <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
+            <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
+          </select><br>
+
+          <button type="submit" class="submit-btn">Update</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Profile Crop Modal -->
+    <div id="profileCropModal" class="modal-overlay" style="display:none;">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeCropper('profile')">&times;</span>
+        <h3>Crop Profile Picture</h3>
+        <img id="profileCropImage" style="max-width: 100%;">
+        <button onclick="cropImage('profile')">Crop & Save</button>
+      </div>
+    </div>
+
+    <!-- Cover Crop Modal -->
+    <div id="coverCropModal" class="modal-overlay" style="display:none;">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeCropper('cover')">&times;</span>
+        <h3>Crop Cover Picture</h3>
+        <img id="coverCropImage" style="max-width: 100%;">
+        <button onclick="cropImage('cover')">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Actions -->
+  <div class="proflie_detail_right">
+    <button type="button"><img src="{% static 'images/add-friends.png'%}" alt=""> Friends</button>
+    <button type="button"><img src="{% static 'images/message.png'%}" alt=""> Message</button>
+    <br />
+    <a href="#"><img src="{% static 'images/more.png'%}" alt=""></a>
+  </div>
+</div>
+
+<!-- Hidden Inputs for Upload -->
+<input type="file" id="profileUpload" name="profile_picture" accept="image/*" hidden>
+<input type="file" id="coverUpload" name="cover_picture" accept="image/*" hidden>
+
+{% endblock %}
+
+<!-- JS Includes -->
+<script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/edit_profile.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>

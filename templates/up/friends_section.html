@@ -1,0 +1,15 @@
+<div class="profile_intro">
+  <div class="title_box d-flex justify-content-between align-items-center mb-2">
+    <h3>Friends</h3>
+    <a href="">All Friends</a>
+  </div>
+  <p>{{ profile.friends|length }} friends ({{ profile.mutual_count }} mutual)</p>
+  <div class="friends_box d-flex flex-wrap gap-3">
+    {% for friend in profile.friends|slice:":9" %}
+    <div class="text-center">
+      <img src="{{ friend.image_url }}" alt="{{ friend.username }}" class="friend-thumb">
+      <p>{{ friend.username }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>

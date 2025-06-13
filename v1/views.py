@@ -46,7 +46,7 @@ def home(request):
         print("Profile fetch error:", str(e))
         messages.error(request, "Error occurred while fetching profile.")
 
-    return render(request, 'Facebook-Clone-main/index.html', {'posts': posts, 'profile': profile_data})
+    return render(request, 'home.html', {'posts': posts, 'profile': profile_data})
 
 
 
@@ -179,7 +179,7 @@ def dashboard_view(request):
 
 
 
-    return render(request, 'Facebook-Clone-main/user.html', {
+    return render(request, 'user2.html', {
         'profile': profile_data,
         'username': request.session.get('username'),
         'email': request.session.get('email'),

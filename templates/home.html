@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block container %}
+<div class="container">
+    <div class="left_sidebar">
+        <div class="important_link">
+            <a href="#"><img src="{% static 'images/news.png' %}" alt="News">Latest News</a>
+            <a href="#"><img src="{% static 'images/friends.png' %}" alt="Friends">Friends</a>
+            <a href="#"><img src="{% static 'images/group.png' %}" alt="Group">Group</a>
+            <a href="#"><img src="{% static 'images/marketplace.png' %}" alt="Marketplace">Marketplace</a>
+            <a href="#"><img src="{% static 'images/watch.png' %}" alt="Watch">Watch</a>
+            <a href="#">See More</a>
+        </div>
+        <div class="shortcut_links">
+            <p>Your Shortcuts</p>
+            <a href="#"><img src="{% static 'images/shortcut-1.png' %}" alt="">Web Developers</a>
+            <a href="#"><img src="{% static 'images/shortcut-2.png' %}" alt="">Web Design</a>
+            <a href="#"><img src="{% static 'images/shortcut-3.png' %}" alt="">Graphic Design</a>
+            <a href="#"><img src="{% static 'images/shortcut-4.png' %}" alt="">Front End Developer</a>
+        </div>
+    </div>
+
+    <div class="main_content">
+        <div class="story_gallery">
+            <div class="story story1">
+                <img src="{% static 'images/upload.png' %}" alt="Post Story">
+                <p>Post Story</p>
+            </div>
+            <div class="story story2">
+                <img src="{% static 'images/member-1.png' %}" alt="Kashan Adnan">
+                <p>Kashan Adnan</p>
+            </div>
+            <div class="story story3">
+                <img src="{% static 'images/member-2.png' %}" alt="Izhan Farhan">
+                <p>Izhan Farhan</p>
+            </div>
+            <div class="story story4">
+                <img src="{% static 'images/member-3.png' %}" alt="Kamran Sheik">
+                <p>Kamran Sheik</p>
+            </div>
+            <div class="story story5">
+                <img src="{% static 'images/member-4.png' %}" alt="Sameer Khan">
+                <p>Sameer Khan</p>
+            </div>
+        </div>
+
+        <div class="post_container">
+            <div class="user_profile">
+                <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile Picture">
+                <div>
+                    <p>{{ profile.username }}</p>
+                    <small>Public <i class="fa fa-caret-down"></i></small>
+                </div>
+            </div>
+            <div class="post_input_container">
+                <input id="input_value" placeholder="What's on Your Mind" />
+                <button id="button_value">Post</button>
+                <div class="add_post_link">
+                    <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Live Video">Live Video</a>
+                    <a href="#"><img src="{% static 'images/photo.png' %}" alt="Photo/Video">Photo/Video</a>
+                    <a href="#"><img src="{% static 'images/feeling.png' %}" alt="Feeling/Activity">Feeling/Activity</a>
+                </div>
+            </div>
+        </div>
+
+        {% for post in posts %}
+        <div class="post_container">
+            <div class="post_row">
+                <div class="user_profile">
+                    <img src="{{ post.profile_picture }}" alt="User">
+                    <div>
+                        <p>{{ post.username }}</p>
+                        <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
+                    </div>
+                </div>
+                <a href="#"><i class="fa fa-ellipsis-v"></i></a>
+            </div>
+
+            {% if post.title %}
+                <p class="post_text">{{ post.title }}</p>
+            {% endif %}
+            {% if post.caption %}
+                <p class="post_text">{{ post.caption }}</p>
+            {% endif %}
+            {% if post.content %}
+                <p class="post_text">{{ post.content }}</p>
+            {% endif %}
+
+            {% for media_item in post.media %}
+                {% with media_item|lower as f %}
+                    {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+                        <img src="{{ media_item }}" alt="Post Image" class="post_img">
+                    {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                        <video controls class="post_img">
+                            <source src="{{ media_item }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% elif ".mp3" in f or ".wav" in f %}
+                        <audio controls class="post_img">
+                            <source src="{{ media_item }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+
+            <div class="post_row">
+                <div class="activity_icon">
+                    <div><img src="{% static 'images/like-blue.png' %}" alt="Like">120</div>
+                    <div><img src="{% static 'images/comments.png' %}" alt="Comments">65</div>
+                    <div><img src="{% static 'images/share.png' %}" alt="Share">130</div>
+                </div>
+                <div class="post_profile_icon">
+                    <img src="{% static 'images/profile-pic.png' %}" alt="Profile Icon">
+                    <i class="fa fa-caret-down"></i>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="button" class="our_btn">Load More</button>
+
+        <footer>
+            <p>&copy; 2022 - Easy Tutorial YouTube Channel</p>
+        </footer>
+    </div>
+
+    <div class="right_sidebar">
+        <div class="sider_bar_title">
+            <h4>Events</h4>
+            <a href="#">See All</a>
+        </div>
+        <div class="event">
+            <div class="Left_event">
+                <h3>18</h3>
+                <span>March</span>
+            </div>
+            <div class="Right_event">
+                <h4>Social Media</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Willson Tech Park</p>
+                <a href="#">More Info</a>
+            </div>
+        </div>
+        <div class="event">
+            <div class="Left_event">
+                <h3>22</h3>
+                <span>June</span>
+            </div>
+            <div class="Right_event">
+                <h4>Mobile Marketing</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Orangi Town Karachi</p>
+                <a href="#">More Info</a>
+            </div>
+        </div>
+
+        <div class="sider_bar_title">
+            <h4>Advertisement</h4>
+            <a href="#">Close</a>
+        </div>
+        <img src="{% static 'images/advertisement.png' %}" alt="Advertisement" class="advirsment_side_bar">
+
+        <div class="sider_bar_title">
+            <h4>Conversation</h4>
+            <a href="#">Hide Chat</a>
+        </div>
+        <div class="online_list">
+            <div class="online_icon">
+                <img src="{% static 'images/member-1.png' %}" alt="Kashan">
+            </div>
+            <p>Kashan Adnan</p>
+        </div>
+        <div class="online_list">
+            <div class="online_icon">
+                <img src="{% static 'images/member-2.png' %}" alt="Izhan">
+            </div>
+            <p>Izhan Farhan</p>
+        </div>
+        <div class="online_list">
+            <div class="online_icon">
+                <img src="{% static 'images/member-3.png' %}" alt="Kamran">
+            </div>
+            <p>Kamran Sheikh</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

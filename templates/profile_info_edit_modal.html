@@ -1,0 +1,30 @@
+<div class="modal fade" id="editInfoModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="infoForm" class="modal-content">
+      <div class="modal-header">
+        <h5>Edit Profile Info</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input name="username" class="form-control" value="{{ profile.username }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Bio</label>
+          <textarea name="bio" class="form-control">{{ profile.bio }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Visibility</label>
+          <select name="visibility_status" class="form-select">
+            <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
+            <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
