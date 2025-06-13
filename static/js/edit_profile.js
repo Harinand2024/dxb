@@ -483,29 +483,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Intro field management functions
-    window.addIntroField = function(button) {
-        const input = button.previousElementSibling;
-        const text = input.value.trim();
+    // window.addIntroField = function(button) {
+    //     const input = button.previousElementSibling;
+    //     const text = input.value.trim();
         
-        if (!text) {
-            alert('Please enter some text first');
-            return;
-        }
+    //     if (!text) {
+    //         alert('Please enter some text first');
+    //         return;
+    //     }
 
-        const list = button.closest('.profile_intro').querySelector('.introFieldsList');
-        const newItem = document.createElement('li');
-        newItem.className = 'd-flex align-items-center mb-2';
-        newItem.innerHTML = `
-            <img src="images/profile-job.png" alt="Custom" class="me-2" />
-            <span contenteditable="true" class="flex-grow-1">${text}</span>
-            <button class="btn btn-sm ms-2" onclick="removeIntroField(this)" title="Delete">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        `;
+    //     const list = button.closest('.profile_intro').querySelector('.introFieldsList');
+    //     const newItem = document.createElement('li');
+    //     newItem.className = 'd-flex align-items-center mb-2';
+    //     newItem.innerHTML = `
+    //         <span contenteditable="true" class="flex-grow-1">${text}</span>
+    //         <button class="btn btn-sm ms-2" onclick="removeIntroField(this)" title="Delete">
+    //             <i class="fas fa-trash-alt"></i>
+    //         </button>
+    //     `;
         
-        list.appendChild(newItem);
-        input.value = '';
-    };
+    //     list.appendChild(newItem);
+    //     input.value = '';
+    // };
 
     window.removeIntroField = function(button) {
         if (confirm('Are you sure you want to remove this field?')) {
@@ -579,11 +578,13 @@ const introContainer = document.getElementById('introContainer');
 const profileId = introContainer.dataset.profileId;
 const bccessToken = introContainer.dataset.accessToken;
 
+// Updated JavaScript for Profile Intro Management
+
+
 function updateIntroSectionTitle(el) {
   const sectionDiv = el.closest('.profile_intro');
   const sectionId = sectionDiv.dataset.sectionId;
   const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
-
   const newTitle = el.textContent.trim();
 
   fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
@@ -597,9 +598,7 @@ function updateIntroSectionTitle(el) {
       display_order: displayOrder,
       description: ""
     })
-  })
-  .then(r => r.json())
-  .then(d => {
+  }).then(r => r.json()).then(d => {
     if (!d.status) alert('Failed to update section title');
   });
 }
@@ -607,38 +606,34 @@ function updateIntroSectionTitle(el) {
 function addIntroField(btn) {
   const input = btn.previousElementSibling;
   const text = input.value.trim();
-  if (!text) return alert('Please type a field first');
+  if (!text) return alert('Please enter a field value');
 
-  const li = document.createElement('li');
-  li.className = 'd-flex align-items-center mb-2';
-  li.setAttribute('data-field-id', '');
-  li.innerHTML = `
-    <span contenteditable="true">${text}</span>
-    <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
-      <i class="fas fa-trash-alt"></i>
-    </button>`;
+  const sectionDiv = btn.closest('.profile_intro');
+  const sectionId = sectionDiv.dataset.sectionId;
+  const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
+  const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
+  const fieldList = sectionDiv.querySelectorAll('li');
 
-  btn.closest('.profile_intro').querySelector('.introFieldsList').appendChild(li);
-  input.value = '';
-}
-
-function removeIntroField(btn) {
-  if (confirm('Delete this field?')) {
-    btn.closest('li').remove();
-  }
-}
-
-function addNewIntroSection() {
-  const title = prompt('New section title');
-  if (!title) return;
+  // Check for duplicate field
+  const duplicate = Array.from(fieldList).some(li => 
+    li.querySelector('span').textContent.trim().toLowerCase() === text.toLowerCase()
+  );
+  if (duplicate) return alert('This field already exists in the section');
 
   const payload = {
     section: {
-      title: title,
-      display_order: Date.now() % 10000,
+      title: sectionTitle,
+      display_order: displayOrder,
       description: ""
     },
-    fields: []
+    fields: [
+      {
+        field_type: 'text',
+        field_name: text,
+        text_value: text,
+        display_order: fieldList.length + 1
+      }
+    ]
   };
 
   fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
@@ -651,33 +646,43 @@ function addNewIntroSection() {
   })
   .then(res => res.json())
   .then(data => {
-    if (data.status) location.reload();
-    else alert('Failed to add section');
+    if (!data.status) {
+      console.error(data);
+      alert('Error adding field');
+    } else {
+      location.reload();
+    }
   });
+}
+
+function removeIntroField(btn) {
+  if (confirm('Delete this field?')) {
+    btn.closest('li').remove();
+  }
 }
 
 function saveFields(sectionDiv) {
   const sectionId = sectionDiv.dataset.sectionId;
   let displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10);
   if (isNaN(displayOrder)) {
-    displayOrder = Date.now() % 10000;  // fallback value if missing
+    displayOrder = Date.now() % 10000;
   }
 
   const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
+  const fieldList = Array.from(sectionDiv.querySelectorAll('li'));
 
-  const fields = Array.from(sectionDiv.querySelectorAll('li')).map((li, i) => {
-  const fieldName = li.querySelector('span').textContent.trim();
-  const fieldId = li.dataset.fieldId;
-  const field = {
-        field_type: 'text',
-        field_name: fieldName,
-        text_value: fieldName,
-        display_order: i + 1
+  const fields = fieldList.map((li, i) => {
+    const fieldName = li.querySelector('span').textContent.trim();
+    const fieldId = li.dataset.fieldId;
+    const field = {
+      field_type: 'text',
+      field_name: fieldName,
+      text_value: fieldName,
+      display_order: i + 1
     };
     if (fieldId) field.id = fieldId;
     return field;
-    });
-
+  });
 
   const payload = {
     section: {
@@ -703,6 +708,35 @@ function saveFields(sectionDiv) {
       alert('Error saving fields');
     } else {
       alert('Section saved successfully');
+      location.reload();
     }
+  });
+}
+
+function addNewIntroSection() {
+  const title = prompt('Enter new section title');
+  if (!title) return;
+
+  const payload = {
+    section: {
+      title: title,
+      display_order: Date.now() % 10000,
+      description: ""
+    },
+    fields: []
+  };
+
+  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) location.reload();
+    else alert('Failed to add section');
   });
 }
