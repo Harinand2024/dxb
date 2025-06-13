@@ -11,11 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const coverImage = document.getElementById('coverImage');
     const profileImage = document.querySelector('.pd_image');
 
-    // Debug: Check if elements exist
-    console.log('Profile input:', profileInput);
-    console.log('Cover input:', coverInput);
-    console.log('Profile crop image:', profileCropImage);
-    console.log('Cover crop image:', coverCropImage);
 
     // Open cropper in modal
     function openCropper(type, file) {
@@ -158,78 +153,61 @@ document.addEventListener('DOMContentLoaded', function () {
     // Upload image function
     function uploadImage(type, file) {
         const formData = new FormData();
-        
-        // Add the image file with the correct field name
+
+        // Append file to form data
         if (type === 'profile') {
             formData.append('profile_picture', file);
         } else if (type === 'cover') {
             formData.append('cover_picture', file);
         }
 
-        // Get CSRF token - Try multiple methods
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                        document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ||
-                        getCookie('csrftoken');
-        
-        if (csrfToken) {
-            formData.append('csrfmiddlewaretoken', csrfToken);
-            headers['X-CSRFToken'] = csrfToken;
-        }
-
         // Get profile ID
-        const profileId = document.querySelector('.profile_container')?.dataset.profileId || 
+        const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
                         document.querySelector('[name="profile_id"]')?.value ||
                         getProfileIdFromUrl();
-        
+
         if (!profileId) {
             console.error('Profile ID not found');
             showNotification('Profile ID not found. Please refresh the page.', 'error');
             return;
         }
 
-        // Fix: Use relative URL and remove hardcoded localhost
-        const uploadUrl = `http://127.0.0.1:8001/profile/profile/${profileId}/`;
-        
-        console.log(`Uploading ${type} image to:`, uploadUrl);
-        console.log('CSRF Token:', csrfToken);
+        // Get access token
+        const accessToken = document.querySelector('.profile_container')?.dataset.accessToken;
 
-        // Show loading indicator
-        showNotification(`Uploading ${type} image...`, 'info');
-
-        // Prepare headers - Don't set Content-Type for FormData
-        const headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-        };
-
-        // Add CSRF token to headers as well
-        if (csrfToken) {
-            headers['X-CSRFToken'] = csrfToken;
+        if (!accessToken) {
+            console.error('Access token not found');
+            showNotification('Access token missing. Please log in again.', 'error');
+            return;
         }
 
-        // Try session-based authentication first
+        const uploadUrl = `http://127.0.0.1:8001/profile/profile/${profileId}/`;
+
+        const headers = {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        showNotification(`Uploading ${type} image...`, 'info');
+
         fetch(uploadUrl, {
             method: 'PUT',
             body: formData,
-            headers: headers,
-            credentials: 'include' // Include cookies for session-based auth
+            headers: headers
         })
         .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
             if (!response.ok) {
                 return response.text().then(text => {
                     console.error('Response body:', text);
-                    throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
                 });
             }
             return response.json();
         })
         .then(data => {
-            console.log(`${type} image uploaded successfully:`, data);
             showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} image updated successfully!`, 'success');
-            
-            // Update the image source with the new URL if provided
+
+            // Update the image preview
             if (data.image_url) {
                 if (type === 'profile' && profileImage) {
                     profileImage.src = data.image_url;
@@ -237,32 +215,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     coverImage.src = data.image_url;
                 }
             }
-            
-            // Refresh the page after successful upload to show updated image
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+
+            // Optional reload
+            setTimeout(() => window.location.reload(), 1500);
         })
         .catch(error => {
             console.error(`Error uploading ${type} image:`, error);
-            
-            // More specific error handling
             if (error.message.includes('401')) {
                 showNotification('Authentication failed. Please log in again.', 'error');
-                // Redirect to login page after a delay
-                setTimeout(() => {
-                    window.location.href = '/login/';
-                }, 2000);
+                setTimeout(() => location.href = '/login/', 2000);
             } else if (error.message.includes('403')) {
                 showNotification('You do not have permission to update this profile.', 'error');
             } else if (error.message.includes('405')) {
-                // If PUT method not allowed, try PATCH
                 retryWithPatch(type, file, uploadUrl, headers);
             } else {
                 showNotification(`Failed to update ${type} image. Please try again.`, 'error');
             }
         });
     }
+
 
     // Retry upload with PATCH method if PUT fails
     function retryWithPatch(type, file, uploadUrl, headers) {
