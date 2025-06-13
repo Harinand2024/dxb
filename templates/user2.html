@@ -174,7 +174,7 @@
 
 
   </style>
-<div class="profile_container" data-profile-id="{{ profile.id }}">
+<div class="profile_container" id="profile_container" data-profile-id="{{ profile.id }}" data-access-token="{{ request.session.access }}">
     <div class="container m-0 p-0">
         <div class="cover-wrapper position-relative w-100">
             <img id="coverImage" src="{% if profile.cover_picture %}http://127.0.0.1:8001{{ profile.cover_picture }}{% else %}{% static 'images/cover.png' %}{% endif %}" alt="cover" class="img-fluid" style="max-height: 300px; object-fit: cover; width: 100%;">

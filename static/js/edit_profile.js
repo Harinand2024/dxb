@@ -1,6 +1,6 @@
 let cropper = null;
 let currentCropType = null;
-
+let accessToken = profile_container.dataset.accessToken;
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // Elements
@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (csrfToken) {
             formData.append('csrfmiddlewaretoken', csrfToken);
+            headers['X-CSRFToken'] = csrfToken;
         }
 
         // Get profile ID
@@ -409,12 +410,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle info form submit
     const infoForm = document.getElementById('infoForm');
+
     if (infoForm) {
         infoForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(infoForm);
 
-            // Get profile ID from the form or URL
             const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
                             getProfileIdFromUrl();
 
@@ -425,13 +426,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
                             getCookie('csrftoken');
-            
+
             if (csrfToken) {
                 formData.append('csrfmiddlewaretoken', csrfToken);
             }
 
-            let headers = {
+            const headers = {
                 'X-Requested-With': 'XMLHttpRequest',
+                'Authorization': `Bearer ${accessToken}`
             };
 
             if (csrfToken) {
@@ -454,11 +456,10 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 showNotification('Profile info updated successfully!', 'success');
-                // Close modal
+
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
                 if (modal) modal.hide();
-                
-                // Update the display with new data
+
                 if (data.username) {
                     const usernameElements = document.querySelectorAll('h3:first-child, p:first-child');
                     usernameElements.forEach(el => {
@@ -467,13 +468,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 }
-                
-                // Optionally reload page after a delay
+
                 setTimeout(() => location.reload(), 2000);
             })
             .catch(error => {
                 console.error('Error updating profile:', error);
-                
+
                 if (error.message.includes('401')) {
                     showNotification('Authentication failed. Please log in again.', 'error');
                 } else if (error.message.includes('403')) {
@@ -484,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
 
     // Utility function to show notifications
     function showNotification(message, type = 'info') {
@@ -605,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 const introContainer = document.getElementById('introContainer');
 const profileId = introContainer.dataset.profileId;
-const accessToken = introContainer.dataset.accessToken;
+const bccessToken = introContainer.dataset.accessToken;
 
 function updateIntroSectionTitle(el) {
   const sectionDiv = el.closest('.profile_intro');
