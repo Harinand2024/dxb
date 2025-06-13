@@ -7,33 +7,35 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import csrf_protect
 
 # Create your views here.
-
 def home(request):
     if not request.session.get('access'):
         return redirect('login')
+
     access_token = request.session.get('access')
     profile_id = request.session.get('profile_id')
 
     if not profile_id:
         messages.error(request, "Profile ID not found.")
         return redirect('login')
-    access_token = request.session.get('access')
-    headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.get('http://127.0.0.1:8001/media/all-posts/', headers=headers)
 
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    # Fetch posts
+    response = requests.get('http://127.0.0.1:8001/media/all-posts/', headers=headers)
     posts = []
     if response.status_code == 200:
         posts = response.json().get('data', [])
         for post in posts:
-            # Fix media file URLs
             post['media'] = [
                 f"http://127.0.0.1:8001{m['file']}" for m in post.get('media', [])
             ]
-            # Fix profile picture URL
-            if post.get('profile_picture'):
-                post['profile_picture'] = f"http://127.0.0.1:8001/media/{post['profile_picture']}"
-            else:
-                post['profile_picture'] = '/static/images/profile_picture.png'
+            post['profile_picture'] = (
+                f"http://127.0.0.1:8001/media/{post['profile_picture']}"
+                if post.get('profile_picture')
+                else '/static/images/profile_picture.png'
+            )
+
+    # Fetch profile data
     profile_data = {}
     try:
         profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
@@ -46,7 +48,15 @@ def home(request):
         print("Profile fetch error:", str(e))
         messages.error(request, "Error occurred while fetching profile.")
 
-    return render(request, 'home.html', {'posts': posts, 'profile': profile_data})
+    # ✅ Fetch intro fields
+
+
+    return render(request, 'home.html', {
+        'posts': posts,
+        'profile': profile_data,
+
+    })
+
 
 
 
@@ -136,7 +146,28 @@ def dashboard_view(request):
     if not profile_data.get('cover_picture'):
         profile_data['cover_picture'] = '/static/images/cover.png'
 
-    # ✅ Fetch actual posts from API
+    intro_sections = []
+    try:
+        profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
+        profile_response = requests.get(profile_url, headers=headers)
+        if profile_response.status_code == 200:
+            profile_json = profile_response.json().get('data', {})
+            profile_data.update(profile_json)  # merge fields into existing dict
+
+            # Parse the field_sections from profile
+            for section in profile_json.get('field_sections', []):
+                intro_sections.append({
+                    'id': section['id'],
+                    'title': section['title'],
+                    'display_order': section['display_order'],
+                    'fields': section.get('fields', [])
+                })
+        else:
+            messages.error(request, "Failed to fetch profile data.")
+    except Exception as e:
+        print("Intro section fetch error:", str(e))
+        messages.error(request, "Error occurred while fetching intro sections.")
+
     posts = []
     try:
         posts_url = f'http://127.0.0.1:8001/media/profile-posts/profile-id/{profile_id}/'  # ← use f-string here
@@ -185,6 +216,7 @@ def dashboard_view(request):
         'email': request.session.get('email'),
         'photos': photos,
         'posts': posts,
+        'intro_sections': intro_sections
     })
 
 

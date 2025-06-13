@@ -344,75 +344,64 @@
     <div class="profile_info">
         <div class="info_col">
             
-            <div id="introContainer">
-                <div class="profile_intro border rounded p-3 mb-3">
-                    <h3 contenteditable="true"  class="mb-3">
-                    <i class="fas fa-user-edit edit-icon me-2"></i>Intro
-                    </h3>
+            <div id="introContainer"
+                    data-profile-id="{{ profile.id }}"
+                    data-access-token="{{ request.session.access }}">
 
-                    <p class="intro_text mb-3 ">
-                    <span contenteditable="true">
-                        Believe in yourself and you can do unbelievable things.
-                    </span>
-                    <img src="images/feeling.png" alt="Feeling Icon"  />
-                    </p>
+                {% for intro_section in intro_sections %}
+                    <div class="profile_intro border rounded p-3 mb-3"
+                        data-section-id="{{ intro_section.id }}"
+                        data-display-order="{{ intro_section.display_order }}">
 
-                    <hr />
+                        <!-- Editable Section Title -->
+                        <h3 contenteditable="true" class="mb-3"
+                            onblur="updateIntroSectionTitle(this)">
+                            <i class="fas fa-user-edit edit-icon me-2"></i>
+                            {{ intro_section.title|default:"Untitled Section" }}
+                        </h3>
 
-                    <ul class="introFieldsList list-unstyled">
-                    <li class="d-flex align-items-center mb-2">
-                        <img src="images/profile-job.png" alt="Job" class="me-2"  />
-                        <span contenteditable="true" class="flex-grow-1">
-                        Director at 99media ltd
-                        </span>
-                        <button
-                        class="btn btn-sm  ms-2"
-                        onclick="removeIntroField(this)"
-                        title="Delete"
-                        >
-                        <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </li>
+                        <!-- Fields -->
+                        <ul class="introFieldsList list-unstyled">
+                            {% for field in intro_section.fields %}
+                            <li class="d-flex align-items-center mb-2" data-field-id="{{ field.id }}">
+                                <span contenteditable="true">{{ field.field_name }}</span>
+                                <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
 
-                    <li class="d-flex align-items-center mb-2">
-                        <img src="images/profile-study.png" alt="Study" class="me-2"  />
-                        <span contenteditable="true" class="flex-grow-1">
-                        Studied at Amity University
-                        </span>
-                        <button
-                        class="btn btn-sm  ms-2"
-                        onclick="removeIntroField(this)"
-                        title="Delete"
-                        >
-                        <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </li>
-                    </ul>
+                        <!-- Add Field Input -->
+                        <div class="d-flex mt-3">
+                            <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
+                            <button class="btn btn-outline-primary-art" onclick="addIntroField(this)">
+                                <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
 
-                    <!-- Add New Field -->
-                    <div class="d-flex mt-3">
-                    <input
-                        type="text"
-                        class="form-control me-2 newFieldInput"
-                        placeholder="Add custom intro line..."
-                    />
-                    <button
-                        class="btn btn-outline-primary-art "
-                        onclick="addIntroField(this)"
-                        title="Add Field"
-                    >
-                        <i class="fas fa-plus-circle"></i>
-                    </button>
+                        <!-- Save Section -->
+                        <div class="mt-2 text-end">
+                            <button class="btn btn-success btn-sm" onclick="saveFields(this.closest('.profile_intro'))">
+                                <i class="fas fa-save me-1"></i> Save Section
+                            </button>
+                        </div>
                     </div>
+                {% endfor %}
+
+
+                <!-- Add More Sections -->
+                <div class="text-center">
+                    <button class="btn btn-primary-art w-100 mb-3" onclick="addNewIntroSection()">
+                    <i class="fas fa-plus"></i> Add More Sections
+                    </button>
                 </div>
             </div>
 
-                <!-- Add Section Button -->
-                <div class="text-center">
-                <button class="btn btn-primary-art w-100 mb-3" onclick="addNewIntroSection()">
-                    <i class="fas fa-plus"></i> Add More Sections
-                </button>
-                </div>
+
+
+
+
 
 
             <div class="profile_intro">
@@ -436,18 +425,7 @@
                     <a href="allfriends-new.html">All Freinds</a>
                 </div>
                 <p>120 (10 mutal)</p>
-                <div class="freinds_box">
-                    <div><img src="images/member-1.png" alt=""> <p>Adnan Y</p></div> 
-                    <div><img src="images/member-2.png" alt=""> <p>Izhan F</p></div> 
-                    <div><img src="images/member-3.png" alt=""> <p>Kamran S</p></div> 
-                    <div><img src="images/member-4.png" alt=""> <p>Sameer K</p></div> 
-                    <div><img src="images/member-5.png" alt=""> <p>Fatiama A</p></div> 
-                    <div><img src="images/member-6.png" alt=""> <p>Arham Ar</p></div> 
-                    <div><img src="images/member-7.png" alt=""> <p>Kamil Y</p></div> 
-                    <div><img src="images/member-8.png" alt=""> <p>Amir Y</p></div> 
-                    <div><img src="images/member-9.png" alt=""> <p>Kashan A</p></div> 
-                    
-                </div>
+   ]
             </div>
         </div>
         <div class="post_col">

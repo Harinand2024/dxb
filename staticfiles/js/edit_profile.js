@@ -545,32 +545,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const container = document.getElementById('introContainer');
         const newSection = document.createElement('div');
         newSection.className = 'profile_intro border rounded p-3 mb-3';
-
-        // Generate a temporary display order
-        const displayOrder = Date.now() % 10000;
-        newSection.dataset.displayOrder = displayOrder;
-
         newSection.innerHTML = `
             <h3 contenteditable="true" class="mb-3">
-            <i class="fas fa-user-edit edit-icon me-2"></i>New Section
+                <i class="fas fa-user-edit edit-icon me-2"></i>New Section
             </h3>
             <ul class="introFieldsList list-unstyled"></ul>
             <div class="d-flex mt-3">
-            <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
-            <button class="btn btn-outline-primary-art" onclick="addIntroField(this)" title="Add Field">
-                <i class="fas fa-plus-circle"></i>
-            </button>
-            </div>
-            <div class="mt-3 text-end">
-            <button class="btn btn-sm btn-primary" onclick="saveFields(this.closest('.profile_intro'))">
-                Save Section
-            </button>
+                <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
+                <button class="btn btn-outline-primary-art" onclick="addIntroField(this)" title="Add Field">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
             </div>
         `;
-
+        
         container.appendChild(newSection);
-        };
-
+    };
 
     // Name editing functions
     window.enableEdit = function() {
@@ -603,15 +592,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Profile script initialized successfully');
 });
+
 const introContainer = document.getElementById('introContainer');
 const profileId = introContainer.dataset.profileId;
 const accessToken = introContainer.dataset.accessToken;
+const imageSrc = introContainer.dataset.imgSrc;
 
 function updateIntroSectionTitle(el) {
   const sectionDiv = el.closest('.profile_intro');
   const sectionId = sectionDiv.dataset.sectionId;
-  const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
-
+  const displayOrder = sectionDiv.dataset.displayOrder;
   const newTitle = el.textContent.trim();
 
   fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
@@ -622,7 +612,7 @@ function updateIntroSectionTitle(el) {
     },
     body: JSON.stringify({
       title: newTitle,
-      display_order: displayOrder,
+      display_order: parseInt(displayOrder, 10),
       description: ""
     })
   })
@@ -641,18 +631,19 @@ function addIntroField(btn) {
   li.className = 'd-flex align-items-center mb-2';
   li.setAttribute('data-field-id', '');
   li.innerHTML = `
+    <img src="${imageSrc}" alt="Custom" class="me-2" />
     <span contenteditable="true">${text}</span>
     <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
       <i class="fas fa-trash-alt"></i>
     </button>`;
-
   btn.closest('.profile_intro').querySelector('.introFieldsList').appendChild(li);
   input.value = '';
 }
 
 function removeIntroField(btn) {
   if (confirm('Delete this field?')) {
-    btn.closest('li').remove();
+    const li = btn.closest('li');
+    li.remove();
   }
 }
 
@@ -686,31 +677,21 @@ function addNewIntroSection() {
 
 function saveFields(sectionDiv) {
   const sectionId = sectionDiv.dataset.sectionId;
-  let displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10);
-  if (isNaN(displayOrder)) {
-    displayOrder = Date.now() % 10000;  // fallback value if missing
-  }
-
+  const displayOrder = sectionDiv.dataset.displayOrder;
   const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
 
-  const fields = Array.from(sectionDiv.querySelectorAll('li')).map((li, i) => {
-  const fieldName = li.querySelector('span').textContent.trim();
-  const fieldId = li.dataset.fieldId;
-  const field = {
-        field_type: 'text',
-        field_name: fieldName,
-        text_value: fieldName,
-        display_order: i + 1
-    };
-    if (fieldId) field.id = fieldId;
-    return field;
-    });
-
+  const fields = Array.from(sectionDiv.querySelectorAll('li')).map((li, i) => ({
+    id: li.dataset.fieldId || null,
+    field_type: 'text',
+    field_name: li.querySelector('span').textContent.trim(),
+    text_value: li.querySelector('span').textContent.trim(),
+    display_order: i + 1
+  }));
 
   const payload = {
     section: {
       title: sectionTitle,
-      display_order: displayOrder,
+      display_order: parseInt(displayOrder, 10),
       description: ""
     },
     fields
