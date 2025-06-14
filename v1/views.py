@@ -176,6 +176,7 @@ def dashboard_view(request):
             posts_data = posts_response.json().get('data', [])
             for post in posts_data:
                 posts.append({
+                    "id": post.get('id'),
                     "username": post.get('username'),
                     "profile_picture": profile_data.get('profile_picture', ''),
                     "created_at": post.get('created_at'),

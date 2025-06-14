@@ -482,36 +482,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
-    // Intro field management functions
-    // window.addIntroField = function(button) {
-    //     const input = button.previousElementSibling;
-    //     const text = input.value.trim();
-        
-    //     if (!text) {
-    //         alert('Please enter some text first');
-    //         return;
-    //     }
-
-    //     const list = button.closest('.profile_intro').querySelector('.introFieldsList');
-    //     const newItem = document.createElement('li');
-    //     newItem.className = 'd-flex align-items-center mb-2';
-    //     newItem.innerHTML = `
-    //         <span contenteditable="true" class="flex-grow-1">${text}</span>
-    //         <button class="btn btn-sm ms-2" onclick="removeIntroField(this)" title="Delete">
-    //             <i class="fas fa-trash-alt"></i>
-    //         </button>
-    //     `;
-        
-    //     list.appendChild(newItem);
-    //     input.value = '';
-    // };
-
-    window.removeIntroField = function(button) {
-        if (confirm('Are you sure you want to remove this field?')) {
-            button.closest('li').remove();
-        }
-    };
-
     window.addNewIntroSection = function() {
         const container = document.getElementById('introContainer');
         const newSection = document.createElement('div');
@@ -656,10 +626,79 @@ function addIntroField(btn) {
 }
 
 function removeIntroField(btn) {
-  if (confirm('Delete this field?')) {
-    btn.closest('li').remove();
+  if (!confirm('Delete this field?')) return;
+
+  const li = btn.closest('li');
+  const fieldId = li.dataset.fieldId;
+  const introContainer = document.getElementById('introContainer');
+  const profileId = introContainer.dataset.profileId;
+  const accessToken = introContainer.dataset.accessToken;
+
+  if (!fieldId) {
+    // New unsaved field — just remove from UI
+    li.remove();
+    return;
   }
+
+  // Send DELETE request
+  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ ids: [parseInt(fieldId)] })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) {
+      li.remove(); // Only remove from DOM if successfully deleted
+    } else {
+      alert('Delete failed: ' + (data.message?.non_field_errors?.[0] || 'Unknown error'));
+      console.error(data);
+    }
+  })
+  .catch(err => {
+    console.error('Delete error:', err);
+    alert('Server error during delete');
+  });
 }
+function removeSectionField(btn) {
+  if (!confirm('Delete this section?')) return;
+
+  const sectionDiv = btn.closest('.profile_intro');
+  const sectionId = sectionDiv.dataset.sectionId;
+
+  const introContainer = document.getElementById('introContainer');
+  const accessToken = introContainer.dataset.accessToken;
+
+  if (!sectionId) {
+    // Section not yet saved — remove from UI only
+    sectionDiv.remove();
+    return;
+  }
+
+  // DELETE section by ID (no body required)
+  fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) {
+      sectionDiv.remove();
+    } else {
+      alert('Failed to delete section: ' + (data.message?.non_field_errors?.[0] || 'Unknown error'));
+    }
+  })
+  .catch(err => {
+    console.error('Delete section error:', err);
+    alert('Server error deleting section');
+  });
+}
+
 
 function saveFields(sectionDiv) {
   const sectionId = sectionDiv.dataset.sectionId;
@@ -690,7 +729,7 @@ function saveFields(sectionDiv) {
       display_order: displayOrder,
       description: ""
     },
-    fields
+    // fields
   };
 
   fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
@@ -740,3 +779,42 @@ function addNewIntroSection() {
     else alert('Failed to add section');
   });
 }
+
+function handleDeleteClick(el, event) {
+  event.preventDefault();
+
+  const postId = el.dataset.postId;
+  const introContainer = document.getElementById('introContainer');
+  const accessToken = introContainer ? introContainer.dataset.accessToken : null;
+
+  if (!postId || !accessToken) {
+    console.error("Missing postId or accessToken", { postId, accessToken });
+    alert("Unable to delete: Missing data.");
+    return;
+  }
+
+  if (!confirm('Are you sure you want to delete this post?')) return;
+
+  fetch(`http://127.0.0.1:8001/media/post/${postId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+  .then(response => {
+    if (response.status === 204) {
+      const postElement = el.closest('.post_container');
+      if (postElement) postElement.remove();
+    } else {
+      return response.json().then(data => {
+        alert(data.message || 'Failed to delete post.');
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error deleting post:', error);
+    alert('Error deleting post');
+  });
+}
+console.log("postId:", postId);
+console.log("accessToken:", accessToken);

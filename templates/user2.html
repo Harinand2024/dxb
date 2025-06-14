@@ -365,16 +365,21 @@
                     data-access-token="{{ request.session.access }}">
 
                 {% for intro_section in intro_sections %}
-                    <div class="profile_intro border rounded p-3 mb-3"
+                    <div class="profile_intro border rounded p-3 mb-3" id="intro_section"
                         data-section-id="{{ intro_section.id }}"
                         data-display-order="{{ intro_section.display_order }}">
 
                         <!-- Editable Section Title -->
-                        <h3 contenteditable="true" class="mb-3"
-                            onblur="updateIntroSectionTitle(this)">
-                            <i class="fas fa-user-edit edit-icon me-2"></i>
-                            {{ intro_section.title|default:"Untitled Section" }}
-                        </h3>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 contenteditable="true" onblur="updateIntroSectionTitle(this)">
+                                {{ intro_section.title|default:"Untitled Section" }}
+                            </h3>
+                            <button class="btn btn-sm btn-danger" onclick="removeSectionField(this)" title="Delete Section">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+
+                        
 
                         <!-- Fields -->
                         <ul class="introFieldsList list-unstyled">
@@ -551,17 +556,20 @@
                         <div class="user_profile">
                             <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
                             <div>
+                                <h1>{{post.id}}</h1>
                                 <p>{{ post.username }}</p>
                                 <span>{{ post.created_at}}</span>
                                 <span>{{ post.visibility}}</span>
                             </div>
                         </div>
-                        <div class="dropdown text-end   ">
-                            <a href="#" class="text-dark" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="dropdown text-end">
+                            <a href="#" class="text-dark" id="dropdownMenuLink{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-ellipsis-v"></i>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end " aria-labelledby="dropdownMenuLink">
-                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ post.id }}">
+                                <li>
+                                    <a href="#" class="dropdown-item"data-post-id="{{ post.id }}"onclick="handleDeleteClick(this, event)">Delete</a>
+                                </li>
                                 <li><a class="dropdown-item" href="#">Hide Post</a></li>
                             </ul>
                         </div>
