@@ -257,6 +257,7 @@
                     {% for friend in profile.friends|slice:":4" %}
                         <img src="{% static friend.image %}" alt="{{ friend.name }}">
                     {% endfor %}
+                    <p>{{profile.bio}}</p>
                 </div>
             </div>
         </div>
