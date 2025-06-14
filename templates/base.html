@@ -30,6 +30,13 @@
             <a href="{% url 'home' %}" class="logo">
                 <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
             </a>
+             <div class="search_box">
+                <img src="{% static 'images/search.png' %}" alt="search">
+                <input type="search" placeholder="Search">
+            </div>
+
+        </div>
+        <div class="nav_right">
             <ul class="icon-list d-flex list-unstyled mb-0">
             <li class="me-3">
                 <i class="fas fa-bell" title="Notifications"></i>
@@ -41,13 +48,7 @@
                 <i class="fas fa-video" title="Videos"></i>
             </li>
             </ul>
-
-        </div>
-        <div class="nav_right">
-            <div class="search_box">
-                <img src="{% static 'images/search.png' %}" alt="search">
-                <input type="search" placeholder="Search">
-            </div>
+           
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
                 <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="profile">
             </div>

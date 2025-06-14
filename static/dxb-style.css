@@ -1,8 +1,8 @@
- body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f5f6fa;
-    }
 
+body{
+   background: linear-gradient(135deg, #f8f6ff, #e2dafa, #c7c1da) !important;
+   font-family: 'Trebuchet MS', sans-serif;
+}
     .login-section {
       min-height: 100vh;
     }
@@ -31,17 +31,17 @@
 
     .login-form input:focus {
       box-shadow: none;
-      border-color: #2d77b8;
+      border-color: #382671;
     }
 
     .btn-login {
-      background-color: #2d77b8;
-      color: #fff;
+      background-color: #382671 !important;
+      color: #fff !important;
     }
 
     .btn-login:hover {
-      background-color: #d91d23;
-      color: #fff;
+      background-color: #f47323 !important;
+      color: #fff !important;
     }
 
     .side-panel {
@@ -60,13 +60,13 @@
         }
         
     .btn-dxbnews {
-      background-color: #2d77b8;
-      color: #fff;
-      width: 100%;
+      background-color: #382671 !important;
+      color: #fff !important;
+      width: 100% !important;
     }
 
     .btn-dxbnews:hover {
-      background-color: #d91d23;
+      background-color: #f47323 !important;
       color: #fff;
     }
     .form-control-lg{
@@ -78,6 +78,60 @@
     .form-select-lg{
       font-size: 1rem !important;
     }
+     /* Add this new wrapper for auth pages only */
+    .auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+
+    /* background-color: #f5f6fa; */
+    }
+
+.auth-container {
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Left welcome panel (same as before) */
+.auth-left {
+  flex: 1;
+  background: #fff;
+  padding: 60px 30px;
+  text-align: center;
+  border-right: 1px solid #ddd;
+}
+
+.auth-left img {
+  max-width: 350px;
+  margin-bottom: 20px;
+}
+
+.auth-left h2 {
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.auth-left p {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+/* Right form section */
+.auth-right {
+  flex: 1;
+  padding: 50px;
+}
+ @media (max-width: 468px) {
+  .d-none-m{
+    display: none !important;
+  }
+ }
     @media (max-width: 768px) {
       .side-panel {
         padding: 40px 20px;
@@ -86,14 +140,23 @@
       .form-box {
         padding: 30px 20px;
       }
+      .auth-wrapper{
+    padding: 0;
+  }
+  .auth-container {
+  
+    flex-direction: column;
+  }
+
+  .auth-left {
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .auth-right {
+    padding: 30px 20px;
+  }
     }
 
    
-    
 
-   
-
-
-  
-
-    

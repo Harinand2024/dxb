@@ -6,10 +6,20 @@
 }
 
 body {
-    background: linear-gradient(135deg, #f8f9fa, #dbe9f4, #c0d3eb) !important;
-   
-}
+   background: linear-gradient(135deg, #f8f6ff, #e2dafa, #c7c1da) !important;
+  /* background: url('images/bg-art.png') no-repeat center center fixed;
+  background-size: cover;
+  position: relative; */
 
+
+}
+/* body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(56 38 113 / 63%);
+  z-index: -1;
+} */
 #post {
     margin-top: 60px;
     margin-left: -540px;
@@ -47,13 +57,13 @@ nav {
 .icon-list li i:hover {
   color: #f47323; /* Facebook blue or your preferred color */
 }
-.nav_left ul li {
+.nav_right ul li {
     list-style: none;
     display: inline-block;
     margin-bottom: 0px !important
 }
 
-.nav_left ul li img {
+.nav_right ul li img {
     width: 28px;
     margin: 0 15px;
 }
@@ -66,6 +76,9 @@ nav {
 
 .nav_user_icon {
     margin-left: 30px;
+}
+.text-primary-art{
+    color: #f47323 !important;
 }
 .btn-primary-art{
     background: #382671 !important;
@@ -99,7 +112,7 @@ nav {
 .search_box input {
     width: 100%;
     background-color: transparent;
-    padding: 6px;
+    padding: 10px;
     outline: none;
     border: none;
 }
@@ -127,17 +140,20 @@ nav {
 }
 
 .left_sidebar {
-    flex-basis: 25%;
+   flex-basis: 25%;
     position: sticky;
-    top: 90px;
     align-self: flex-start;
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 0;
 }
 
 .right_sidebar {
     background-color: #fff;
     flex-basis: 25%;
     padding: 20px;
-    height: 89vh;
+   
     border-radius: 4px;
     color: #222222;
     position: sticky;
@@ -213,11 +229,12 @@ nav {
     height: 65px;
     width: 65px;
     margin-right: 15px;
-    padding-top: 10px;
+    padding-top: 16px;
     text-align: center;
     position: relative;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: #f47323;
 }
 
 .event .Left_event span {
@@ -373,8 +390,9 @@ nav {
 }
 
 .add_post_link {
-    display: flex;
-    margin-top: -20px;
+   display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .add_post_link a {
@@ -562,7 +580,6 @@ footer {
 .profile_container {
     padding: 20px 15%;
     color: #222222;
-    background: #eee;
 }
 
 .cover {
@@ -764,6 +781,12 @@ footer {
 }
 
 /* todo:  🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥 Its Media  Query TIme 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥  */
+@media (max-width: 600px) {
+.btn-post{
+    width: 100%;
+    margin-top: 10px;
+}
+}
 @media (max-width: 900px) {
     .right_sidebar {
         display: none;
@@ -865,11 +888,7 @@ footer {
     }
 }
 
-#button_value {
-    padding: 10px 30px;
-    margin-bottom: -440px;
-    margin-left: 430px;
-}
+
 
 #post {
     background-color: #382671;
@@ -880,5 +899,105 @@ footer {
     padding: 10px;
     border-radius: 10px;
     margin-top: -7px;
+}
+
+:focus-visible {
+        outline: none !important;
+    }
+    .cover-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .cover {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+    }
+
+    .edit-icon-top {
+         position: absolute;
+        bottom: 30px;
+        right: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .edit-icon-top:hover {
+      background: #f0f0f0;
+    }
+    .textarea{
+        width: 100%;
+        margin: 10px 0px;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+    .editable:hover {
+        cursor: pointer;
+        background-color: #f0f0f0;
+    }
+    .edit-icon {
+        float: right;
+        cursor: pointer;
+        color: #f47323;
+        font-size: 16px;
+        margin-top: 8px;
+    }
+    .edit-icon:hover {
+        color: #f47323;
+    }
+    .introFieldsList{
+        padding: 0px;
+    }
+    .profile-detail-actions .btn {
+    font-weight: 500;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background-color: #f0f2f5;
+    border: none;
+    transition: background-color 0.3s;
+    }
+
+    .profile-detail-actions .btn:hover {
+    background-color: #e4e6eb;
+    }
+.pd_image {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: cover;
+  border-radius: 6px !important;
+  display: block;
+}
+
+.profile-img-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.camera-icon {
+      position: absolute;
+    bottom: 3px;
+    right: 21px;
+    background-color: #f0f2f5;
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: 4px 5px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 30px;
+    height: 30px;
+}
+
+.camera-icon:hover {
+  background-color: #e4e6eb;
 }
 

@@ -4,7 +4,7 @@
 {% block container %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
     :focus-visible {
         outline: none !important;
@@ -399,28 +399,20 @@
                         </div>
 
                         <!-- Save Section -->
-                        <div class="mt-2 text-end">
-                            <button class="btn btn-success btn-sm" onclick="saveFields(this.closest('.profile_intro'))">
-                                <i class="fas fa-save me-1"></i> Save Section
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary-art btn-md w-100" onclick="saveFields(this.closest('.profile_intro'))">
+                                 Save
                             </button>
                         </div>
                     </div>
                 {% endfor %}
-
-
+            </div>
                 <!-- Add More Sections -->
                 <div class="text-center">
                     <button class="btn btn-primary-art w-100 mb-3" onclick="addNewIntroSection()">
                     <i class="fas fa-plus"></i> Add More Sections
                     </button>
                 </div>
-            </div>
-
-
-
-
-
-
 
             <div class="profile_intro">
                 <div class="title_box">
@@ -430,7 +422,7 @@
                 <div class="photo_box">
                     {% for photo in photos|slice:":6" %}
                         <div>
-                            <img src="{{ photo }}" alt="Photo" class="img-fluid" style="object-fit: cover;">
+                            <img src="{{ photo }}" alt="Photo" class="img-fluid" style="object-fit: cover;width: 100px;height: 100px;">
                         </div>
                     {% empty %}
                         <p>No photos uploaded yet.</p>
@@ -444,13 +436,13 @@
                     <a href="allfriends-new.html">All Freinds</a>
                 </div>
                 <p>120 (10 mutal)</p>
-   ]
+  
             </div>
         </div>
         <div class="post_col">
-            <div class="post_container">
+            <!-- <div class="post_container">
                 <div class="user_profile">
-                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
                     <div>
                         <p>{{ profile.username }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
@@ -461,7 +453,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="profile_id" value="{{ profile.id }}">
 
-                        <!-- Styled textarea like the second snippet -->
+                        
                         <textarea class="textarea" name="content" placeholder="What's on your mind?" rows="3" required></textarea>
                         <br>
 
@@ -471,7 +463,7 @@
                         <button type="submit" class="btn btn-primary mt-2">Post</button>
                     </form>
 
-                    <!-- Icon links styled like the reference snippet -->
+                    
                     <div class="add_post_link mt-2">
                         <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Live Video"> Live Video</a>
                         <a href="#"><img src="{% static 'images/photo.png' %}" alt="Photo/Video"> Photo/Video</a>
@@ -479,7 +471,80 @@
                     </div>
                 </div>
 
-            </div>
+            </div> -->
+
+            <div class="post_container">
+                    <!-- Trigger Card -->
+                
+                    <div class="user_profile">
+                        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                        <div>
+                        <p>{{ profile.username }}</p>
+                        <small>Public <i class="fa fa-caret-down"></i></small>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+
+                        <textarea
+                        class="w-full p-2 border rounded-md bg-gray-100 resize-none"
+                        name="content"
+                        placeholder="What's on your mind?"
+                        rows="3"
+                        onclick="openModal()"
+                        required
+                        ></textarea>
+
+                        <div class="flex justify-between mt-3 text-sm text-blue-500 font-semibold">
+                        <a onclick="openModal()" class="flex items-center space-x-1">
+                            <i class="fas fa-video text-red-500"></i>
+                            <span>Live Video</span>
+                        </a>
+                        <a onclick="openModal()" class="flex items-center space-x-1">
+                            <i class="fas fa-image text-green-500"></i>
+                            <span>Photo/Video</span>
+                        </a>
+                        <a onclick="openModal()" class="flex items-center space-x-1">
+                            <i class="fas fa-smile text-yellow-500"></i>
+                            <span>Feeling/Activity</span>
+                        </a>
+                        </div>
+
+                    </div>
+                    
+
+                    <!-- Post Modal -->
+                    <div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+                    <div class="bg-white w-full max-w-lg rounded-xl p-4">
+                        <div class="flex justify-between items-center border-b pb-3 mb-3">
+                        <h2 class="text-xl font-bold">Create Post</h2>
+                        <button onclick="closeModal()" class="text-gray-500 hover:text-black text-xl">&times;</button>
+                        </div>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="w-10 h-10 rounded-full"/>
+                        <div>
+                            <p>{{ profile.username }}</p>
+                        <small>Public <i class="fa fa-caret-down"></i></small>
+                        </div>
+                        </div>
+
+                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+                        
+                        <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content" placeholder="What's on your mind?" rows="2" required></textarea>
+                        <br>
+
+                        <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
+                        <input type="text" name="caption" placeholder="Caption (optional)" class="form-control mb-2">
+                        <input type="file" name="media_files" multiple class="form-control mb-2">
+                        <button type="submit" class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
+                        </form>
+                    </div>
+                    </div>
+
+                </div>
             {% for post in posts %}
                 <div class="post_container">
                     <div class="post_row">
@@ -521,7 +586,7 @@
                                 {% endwith %}
                             {% endfor %}
                         {% endif %}
-                    <div class="post_row">
+                    <!-- <div class="post_row">
                         <div class="activity_icon">
                             <div><img src="{% static 'images/like-blue.png' %}" alt="Like"> {{ post.reaction_count }}</div>
                             <div><img src="{% static 'images/comments.png' %}" alt="Comments"> {{ post.comment_count }}</div>
@@ -530,7 +595,7 @@
                         <div class="post_profile_icon">
                             <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             {% endfor %}
 
@@ -541,6 +606,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{% static 'js/edit_profile.js' %}"></script>
 <script src="{% static 'js/into.js' %}"></script>
+<script>
+function openModal() {
+    document.getElementById('postModal').classList.remove('hidden');
+    document.getElementById('postModal').classList.add('flex');
+    }
+
+    function closeModal() {
+        document.getElementById('postModal').classList.add('hidden');
+    }
+</script>
 {% endblock %}
 
 

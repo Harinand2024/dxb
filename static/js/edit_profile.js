@@ -533,8 +533,8 @@ document.addEventListener('DOMContentLoaded', function () {
             </button>
             </div>
             <div class="mt-3 text-end">
-            <button class="btn btn-sm btn-primary" onclick="saveFields(this.closest('.profile_intro'))">
-                Save Section
+            <button class="btn btn-outline-primary-art btn-md w-100" onclick="saveFields(this.closest('.profile_intro'))">
+                Save
             </button>
             </div>
         `;
