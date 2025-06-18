@@ -70,9 +70,16 @@
                 <div class="user_profile">
                     <img src="{{ post.profile_picture }}" alt="User">
                     <div>
-                        <p>{{ post.username }}</p>
+                        {% if post.profile == request.session.profile_id %}
+                            <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        {% else %}
+                            <a href="{% url 'profile-dashboard-api' post.profile %}" class="text-decoration-none text-dark">
+                        {% endif %}
+                            <p>{{ post.username }}</p>
+                        </a>
                         <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
                     </div>
+
                 </div>
                 <a href="#"><i class="fa fa-ellipsis-v"></i></a>
             </div>

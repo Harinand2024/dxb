@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import *
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import csrf_protect
+from django.http import JsonResponse
 
 # Create your views here.
 def home(request):
@@ -120,6 +121,7 @@ def dashboard_view(request):
         return redirect('login')
 
     access_token = request.session.get('access')
+    print(f"Session access token: {access_token}")
     profile_id = request.session.get('profile_id')
 
     if not profile_id:
@@ -322,3 +324,92 @@ def forgot_password_view(request):
 
 def reset_password_page(request):
     return render(request, 'Facebook-Clone-main/reset_password.html')
+
+
+def profile_dashboard_view(request, profile_id):
+    print(f"Received dashboard request for profile ID: {profile_id}")
+    access_token = request.session.get('access')
+    print(f"Session access token: {access_token}")
+    if not access_token:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    base_url = 'http://127.0.0.1:8001'
+
+    data = {
+        'profile': {},
+        'intro_sections': [],
+        'posts': [],
+        'photos': [],
+    }
+
+    # === 1. Profile Fetch ===
+    try:
+        profile_url = f'{base_url}/profile/profile/{profile_id}/'
+        profile_response = requests.get(profile_url, headers=headers)
+        profile_json = profile_response.json()
+
+        if profile_response.status_code == 200 and 'data' in profile_json:
+            profile_data = profile_json['data']
+            data['profile'] = profile_data
+        else:
+            return JsonResponse({'error': 'Failed to fetch profile', 'details': profile_json}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': f'Profile fetch error: {str(e)}'}, status=500)
+
+    # === 2. Intro Sections ===
+    for section in data['profile'].get('field_sections', []):
+        data['intro_sections'].append({
+            'id': section['id'],
+            'title': section['title'],
+            'display_order': section['display_order'],
+            'fields': section.get('fields', [])
+        })
+
+    # === 3. Posts ===
+    try:
+        posts_url = f'{base_url}/media/profile-posts/profile-id/{profile_id}/'
+        posts_response = requests.get(posts_url, headers=headers)
+        posts_json = posts_response.json()
+
+        if posts_response.status_code == 200:
+            posts_data = posts_json.get('data', [])
+            data['posts'] = [{
+                'id': post['id'],
+                'username': post.get('username'),
+                "profile_picture": profile_data.get('profile_picture', ''),
+                'created_at': post.get('created_at'),
+                'title': post.get('title'),
+                'caption': post.get('caption'),
+                'reaction_count': post.get('reaction_count', 0),
+                'comment_count': post.get('comment_count', 0),
+                'share_count': post.get('share_count', 0),
+                'media': [f"{base_url}{m.get('file')}" for m in post.get('media', [])]
+            } for post in posts_data]
+        else:
+            print(f"Post fetch failed: {posts_response.status_code} - {posts_response.text}")
+    except Exception as e:
+        print(f"Post fetch error: {e}")
+
+    # === 4. Photos ===
+    try:
+        photos_url = f'{base_url}/media/profile-images/profile-id/{profile_id}/'
+        photos_response = requests.get(photos_url, headers=headers)
+        photos_json = photos_response.json()
+
+        if photos_response.status_code == 200:
+            for item in photos_json.get('data', []):
+                file_url = item.get('file')
+                if file_url:
+                    data['photos'].append(f"{base_url}{file_url}")
+        else:
+            print(f"Photo fetch failed: {photos_response.status_code} - {photos_response.text}")
+    except Exception as e:
+        print(f"Photo fetch error: {e}")
+
+    return render(request, 'profile_id.html', {
+        'profile': data['profile'],
+        'intro_sections': data['intro_sections'],
+        'posts': data['posts'],
+        'photos': data['photos'],
+    })
