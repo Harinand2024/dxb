@@ -130,7 +130,7 @@
           </div>
           <p class="text-muted small">Level 2 of 5</p>
 
-          <div class="card mt-3 p-3 shadow-sm border-0 rounded-4">
+          <div class="card mt-3 p-3 shadow-sm border-0 rounded-4 justify-content-center">
             <h5 class="mb-3 text-muted">🎨 Art Styles</h5>
             <div class="d-flex flex-wrap gap-2 justify-content-center">
               <span class="badge bg-primary rounded-pill px-3 py-2">Abstract</span>
@@ -157,7 +157,7 @@
     <div class="col-md-8">
       <!-- Navigation Bar -->
       <nav
-        class="d-flex justify-content-between align-items-center mb-3 shadow-lg border-1 rounded-4 nav-strong-shadow bg-light"
+        class="d-flex justify-content-between align-items-center mb-3 shadow-lg border-1 rounded-4 nav-strong-shadow bg-light z-2"
         style=" color: white;">
         <div class="d-flex align-items-center gap-3">
           <a href="{% url 'home' %}">
@@ -257,14 +257,14 @@
             </button>
           </div>
 
-
+           
           <!-- Edit Cover Button -->
-          <div>
+          <!-- <div>
             <button class="dropdown-item d-flex align-items-center gap-2" id="uploadBtn">
               <i class="fas fa-upload"></i> Upload photo
             </button>
 
-          </div>
+          </div> -->
 
           <!-- Canvas Button Dropdown -->
 
@@ -275,6 +275,30 @@
 
         </div>
       </div>
+      <!-- Edit Cover Button -->
+            <div class="position-relative float-end me-3 z-1" style="right: 20px; bottom: 55px;">
+                <div class="dropdown">
+                    <button
+                        class="btn btn-light d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-camera"></i> Canvas
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <button class="dropdown-item d-flex align-items-center gap-2" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Upload photo
+                          </button>
+                            <input type="file" id="uploadBtn" accept="image/*" style="display: none;">
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger d-flex align-items-center gap-2" href="#">
+                                <i class="fas fa-trash"></i> Remove
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
     </div>
 
 
