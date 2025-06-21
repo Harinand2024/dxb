@@ -2,27 +2,29 @@
 {% load static %}
 
 {% block container %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <div class="container">
     <div class="left_sidebar">
         <div class="important_link">
-            <a href="#"><img src="{% static 'images/news.png' %}" alt="News">Latest News</a>
-            <a href="#"><img src="{% static 'images/friends.png' %}" alt="Friends">Friends</a>
-            <a href="#"><img src="{% static 'images/group.png' %}" alt="Group">Group</a>
-            <a href="#"><img src="{% static 'images/marketplace.png' %}" alt="Marketplace">Marketplace</a>
-            <a href="#"><img src="{% static 'images/watch.png' %}" alt="Watch">Watch</a>
-            <a href="#">See More</a>
-        </div>
-        <div class="shortcut_links">
+                <a href="#"><i class="fas fa-user-friends text-primary-art me-2"></i>Latest Friends</a>
+                <a href="#"><i class="bi bi-person-circle text-primary-art me-2"></i>Our Circle</a>
+                <!-- <a href="#"><i class="fas fa-users text-primary-art me-2"></i>Group</a>
+                <a href="#"><i class="fas fa-store text-primary-art me-2"></i>Marketplace</a>
+                <a href="#"><i class="fas fa-tv text-primary-art me-2"></i>Watch</a> -->
+                <a href="#">See More</a>
+            </div>
+        <!-- <div class="shortcut_links">
             <p>Your Shortcuts</p>
             <a href="#"><img src="{% static 'images/shortcut-1.png' %}" alt="">Web Developers</a>
             <a href="#"><img src="{% static 'images/shortcut-2.png' %}" alt="">Web Design</a>
             <a href="#"><img src="{% static 'images/shortcut-3.png' %}" alt="">Graphic Design</a>
             <a href="#"><img src="{% static 'images/shortcut-4.png' %}" alt="">Front End Developer</a>
-        </div>
+        </div> -->
     </div>
 
     <div class="main_content">
-        <div class="story_gallery">
+        <!-- <div class="story_gallery">
             <div class="story story1">
                 <img src="{% static 'images/upload.png' %}" alt="Post Story">
                 <p>Post Story</p>
@@ -43,7 +45,7 @@
                 <img src="{% static 'images/member-4.png' %}" alt="Sameer Khan">
                 <p>Sameer Khan</p>
             </div>
-        </div>
+        </div> -->
 
         <div class="post_container">
             <div class="user_profile">
@@ -112,7 +114,7 @@
                 {% endwith %}
             {% endfor %}
 
-            <div class="post_row">
+            <!-- <div class="post_row">
                 <div class="activity_icon">
                     <div><img src="{% static 'images/like-blue.png' %}" alt="Like">120</div>
                     <div><img src="{% static 'images/comments.png' %}" alt="Comments">65</div>
@@ -122,15 +124,15 @@
                     <img src="{% static 'images/profile-pic.png' %}" alt="Profile Icon">
                     <i class="fa fa-caret-down"></i>
                 </div>
-            </div>
+            </div> -->
         </div>
         {% endfor %}
 
-        <button type="button" class="our_btn">Load More</button>
+        <!-- <button type="button" class="our_btn">Load More</button>
 
         <footer>
             <p>&copy; 2022 - Easy Tutorial YouTube Channel</p>
-        </footer>
+        </footer> -->
     </div>
 
     <div class="right_sidebar">

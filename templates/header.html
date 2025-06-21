@@ -1,5 +1,6 @@
 {% load static %}
-<div class="profile_container shadow-sm rounded" data-profile-id="{{ profile.id }}">
+<div class="profile_container" id="profile_container" data-profile-id="{{ profile.id }}"
+  data-access-token="{{ request.session.access }}">
   <div class="row">
 
     <!-- First Column (4 columns wide) -->
@@ -9,7 +10,7 @@
 
         <!-- Profile Image -->
         <div class="card-body text-center pt-4">
-          <div class="position-relative mx-auto" style="width: 120px; height: 120px;">
+          <!-- <div class="position-relative mx-auto" style="width: 120px; height: 120px;">
             {% if profile.profile_picture %}
             <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}"
               class="rounded-circle img-thumbnail shadow-sm" style="width: 120px; height: 120px; object-fit: cover;"
@@ -22,6 +23,34 @@
               style="cursor: pointer;">
               <i class="fas fa-camera text-dark"></i>
             </label>
+          </div> -->
+          <div class="profile-img-wrapper position-relative d-inline-block">
+            <img
+              src="{% if profile.profile_picture %}http://127.0.0.1:8001{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}"
+              alt="Profile" class="pd_image">
+            <label for="profileUpload" class="camera-icon">
+              <i class="fas fa-camera"></i>
+            </label>
+          </div>
+
+          <input type="file" id="profileUpload" name="profile_picture" hidden>
+
+          <div class="modal fade" id="profileCropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Crop Profile Picture</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <img id="profileCropImage" class="img-fluid" />
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button class="btn btn-primary-art" onclick="cropImage('profile')">Crop & Save</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Username & Bio -->
@@ -32,15 +61,16 @@
             </button>
           </h4>
           <p class="text-muted small">
-            {{ profile.followers_count }} Friends • {{ profile.followers_count|length }} Followers • Following: {{
-            profile.following_count|length }}
+            {{ profile.friends_count }} Friends – {{ profile.followers_count }} Followers – Following: {{ profile.following_count }}
           </p>
+
+
           <p class="text-muted small">{{ profile.bio }}</p>
 
           <!-- Actions -->
           <div class="d-flex justify-content-center gap-2 flex-wrap my-3">
-            <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#editInfoModal">
-              <i class="fas fa-pencil-alt text-muted"></i>
+            <button class="btn btn-sm btn-primary-art" data-bs-toggle="modal" data-bs-target="#editInfoModal">
+              <i class="fas fa-pencil-alt me-2"></i>Edit Studio
             </button>
             <!-- Edit Info Modal -->
             <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel"
@@ -48,11 +78,10 @@
               <div class="modal-dialog">
                 <form id="infoForm" class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="editInfoModalLabel">Edit Profile Info</h5>
+                    <h5 class="modal-title">Edit Profile Info</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    {% csrf_token %}
                     <div class="mb-3">
                       <label for="username" class="form-label">Username</label>
                       <input type="text" name="username" class="form-control" value="{{ profile.username }}">
@@ -64,11 +93,10 @@
                     <div class="mb-3">
                       <label for="visibility_status" class="form-label">Visibility</label>
                       <select name="visibility_status" class="form-select">
-                        <option value="public" {% if profile.visibility_status == "public" %}selected{% endif %}>Public</option>
-                        <option value="private" {% if profile.visibility_status == "private" %}selected{% endif %}>Private</option>
-                      </select>
-                    </div>
 
+                      </select>
+
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button type="submit" class="btn btn-primary-art">Save</button>
@@ -77,9 +105,7 @@
               </div>
             </div>
 
-            <button class="btn rounded-2 btn-primary-art">
-              <i class="fas fa-user-plus me-2"></i>Circale
-            </button>
+
             <button class="btn btn-art rounded-2 btn-primary-art">
               <i class="fas fa-envelope me-2"></i>Message
             </button>
@@ -148,8 +174,16 @@
         </div>
         <div class="d-flex align-items-center gap-3" style="color: black;">
           <i class="fas fa-bell fs-5" title="Notifications"></i>
-          <i class="fas fa-envelope fs-5" title="Inbox"></i>
-          <i class="fas fa-video fs-5" title="Videos"></i>
+          <div class="dropdown" id="friendsDropdownContainer">
+              <button type="button" class="btn btn-primary-art d-flex align-items-center rounded-pill dropdown-toggle"
+                id="friendsDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-plus me-2"></i> Friends
+              </button>
+
+              <ul class="dropdown-menu p-2" id="friendRequestsList" style="min-width: 300px;">
+                <li class="text-muted px-3">Loading...</li>
+              </ul>
+            </div>
           <div class="nav_user_icon position-relative" onclick="settingsMenuToggle()" style="cursor: pointer;">
             <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
               alt="Profile" style="height: 40px; width: 40px; object-fit: cover;">
@@ -203,14 +237,14 @@
         <div class="cover-wrapper position-relative w-100 rounded-4 overflow-hidden shadow-sm">
           <div id="coverCarousel" class="carousel slide rounded-4 shadow-sm overflow-hidden" data-bs-ride="carousel">
             <div class="carousel-inner">
-              {% for i in "123"|make_list %}
+              {% for img in canvas_images %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img
-                  src="{% if profile.cover_picture %}http://127.0.0.1:8001{{ profile.cover_picture }}{% else %}{% static 'images/cover.png' %}{% endif %}"
-                  class="d-block w-100" style="max-height: 500px; object-fit: cover;" alt="Cover {{ forloop.counter }}">
+                <img src="{{ img }}" class="d-block w-100" style="max-height: 500px; object-fit: cover;"
+                  alt="Canvas {{ forloop.counter }}">
               </div>
               {% endfor %}
             </div>
+
 
             <!-- Carousel Controls -->
             <button class="carousel-control-prev" type="button" data-bs-target="#coverCarousel" data-bs-slide="prev">
@@ -225,30 +259,20 @@
 
 
           <!-- Edit Cover Button -->
-          <div class="position-absolute text-end me-3" style="right: 20px; bottom: 20px;">
-            <div class="dropdown">
-              <button class="btn btn-light d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
-                type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-camera"></i> Canvas
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li>
-                  <label class="dropdown-item d-flex align-items-center gap-2" for="coverUpload">
-                    <i class="fas fa-upload"></i> Upload photo
-                  </label>
-                  <input type="file" id="coverUpload" accept="image/*" style="display: none;">
-                </li>
-                <li>
-                  <hr class="dropdown-divider">
-                </li>
-                <li>
-                  <a class="dropdown-item text-danger d-flex align-items-center gap-2" href="#">
-                    <i class="fas fa-trash"></i> Remove
-                  </a>
-                </li>
-              </ul>
-            </div>
+          <div>
+            <button class="dropdown-item d-flex align-items-center gap-2" id="uploadBtn">
+              <i class="fas fa-upload"></i> Upload photo
+            </button>
+
           </div>
+
+          <!-- Canvas Button Dropdown -->
+
+
+          <!-- Hidden file input -->
+          <input type="file" id="coverUpload" accept="image/*" multiple style="display: none;">
+
+
         </div>
       </div>
     </div>
@@ -256,6 +280,9 @@
 
   </div>
 </div>
+
+
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const infoForm = document.getElementById('infoForm');

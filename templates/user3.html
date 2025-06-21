@@ -2,13 +2,14 @@
 {% block body %}
 {% load static %}
 
-<div class="profile_container" id="profile_container" data-profile-id="{{ profile.id }}" data-access-token="{{ request.session.access }}">
-    
-    
+<div class="profile_container" id="profile_container" data-profile-id="{{ profile.id }}"
+    data-access-token="{{ request.session.access }}">
+
+
     <div class="profile_info ">
-        
+
         <div class="info_col ">
-            <div class="col mb-3 ">
+            <!-- <div class="col mb-3 ">
                 <div class="card p-3 shadow-sm rounded-2">
                 <h5 class="mb-3">Organization</h5>
 
@@ -35,65 +36,69 @@
                     <i class="fas fa-user-plus me-2"></i> ADD Roles
                 </button>
                 </div>
-            </div>
+            </div> -->
             <div id="introContainer"
                     data-profile-id="{{ profile.id }}"
                     data-access-token="{{ request.session.access }}">
 
                 {% for intro_section in intro_sections %}
-                    <div class="profile_intro border rounded p-3 mb-3" id="intro_section"
-                        data-section-id="{{ intro_section.id }}"
-                        data-display-order="{{ intro_section.display_order }}">
+                <div class="profile_intro border rounded p-3 mb-3" id="intro_section"
+                    data-section-id="{{ intro_section.id }}" data-display-order="{{ intro_section.display_order }}">
 
-                        <!-- Editable Section Title -->
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h3 contenteditable="true" onblur="updateIntroSectionTitle(this)">
-                                {{ intro_section.title|default:"Untitled Section" }}
-                            </h3>
-                            <button class="btn btn-sm btn-danger" onclick="removeSectionField(this)" title="Delete Section">
+                    <!-- Editable Section Title -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 contenteditable="true" onblur="updateIntroSectionTitle(this)">
+                            {{ intro_section.title|default:"Untitled Section" }}
+                        </h3>
+                        <button class="btn btn-sm btn-danger" onclick="removeSectionField(this)" title="Delete Section">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+
+
+
+                    <!-- Fields -->
+                    <ul class="introFieldsList list-unstyled">
+                        {% for field in intro_section.fields %}
+                        <!-- CORRECT -->
+                        <li class="d-flex align-items-center mb-2" data-field-id="{{ field.id }}">
+                            <span contenteditable="true">{{ field.field_name }}</span>
+                            <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-                        </div>
+                        </li>
 
-                        
+                        {% endfor %}
+                    </ul>
 
-                        <!-- Fields -->
-                        <ul class="introFieldsList list-unstyled">
-                            {% for field in intro_section.fields %}
-                            <!-- CORRECT -->
-                                <li class="d-flex align-items-center mb-2" data-field-id="{{ field.id }}">
-                                    <span contenteditable="true">{{ field.field_name }}</span>
-                                    <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </li>
-
-                            {% endfor %}
-                        </ul>
-
-                        <!-- Add Field Input -->
-                        <div class="d-flex mt-3">
-                            <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
-                            <button class="btn btn-outline-art" onclick="addIntroField(this)" style="background-color: #f80c9a; color: #ffffff;">
-                                <i class="fas fa-plus-circle"></i>
-                            </button>
-                        </div>
-
-                        <!-- Save Section -->
-                        <div class="mt-3">
-                            <button class="btn btn-outline-art btn-sm w-100" style="background-color: #f80c9a; color: #ffffff;" onclick="saveFields(this.closest('.profile_intro'))">
-                                 Save
-                            </button>
-                        </div>
+                    <!-- Add Field Input -->
+                    <div class="d-flex mt-3">
+                        <input type="text" class="form-control me-2 newFieldInput"
+                            placeholder="Add custom intro line..." />
+                        <button class="btn btn-outline-art" onclick="addIntroField(this)"
+                            style="background-color: #f80c9a; color: #ffffff;">
+                            <i class="fas fa-plus-circle"></i>
+                        </button>
                     </div>
+
+                    <!-- Save Section -->
+                    <div class="mt-3">
+                        <button class="btn btn-outline-art btn-sm w-100"
+                            style="background-color: #f80c9a; color: #ffffff;"
+                            onclick="saveFields(this.closest('.profile_intro'))">
+                            Save
+                        </button>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
-                <!-- Add More Sections -->
-                <div class="text-center">
-                    <button class="btn btn-art btn-sm w-100 mb-3" onclick="addNewIntroSection()" style="background-color: #030dff; color: #ffffff;">
+            <!-- Add More Sections -->
+            <div class="text-center">
+                <button class="btn btn-art btn-sm w-100 mb-3" onclick="addNewIntroSection()"
+                    style="background-color: #030dff; color: #ffffff;">
                     <i class="fas fa-plus"></i> Add More Sections
-                    </button>
-                </div>
+                </button>
+            </div>
 
             <div class="profile_intro">
                 <div class="title_box">
@@ -102,23 +107,35 @@
                 </div>
                 <div class="photo_box">
                     {% for photo in photos|slice:":6" %}
-                        <div>
-                            <img src="{{ photo }}" alt="Photo" class="img-fluid" style="object-fit: cover;width: 100px;height: 100px;">
-                        </div>
+                    <div>
+                        <img src="{{ photo }}" alt="Photo" class="img-fluid"
+                            style="object-fit: cover;width: 100px;height: 100px;">
+                    </div>
                     {% empty %}
-                        <p>No photos uploaded yet.</p>
+                    <p>No photos uploaded yet.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="profile_intro">
-                <div class="title_box">
-                    <h3>Freinds</h3>
-                    <a href="allfriends-new.html">All Freinds</a>
+                <div class="title_box d-flex justify-content-between align-items-center">
+                    <h3>Friends</h3>
+                    <a href="">All Friends</a> <!-- Replace with real URL name -->
                 </div>
-                <p></p>
-  
+
+                <div class="row row-cols-3 g-2 mt-2">
+                    {% for friend in friends|slice:":6" %}
+                    <div class="col text-center">
+                        <img src="{{ friend.image }}" class="rounded-circle" alt="{{ friend.name }}" width="60"
+                            height="60">
+                        <p class="small mt-1">{{ friend.name }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No friends found.</p>
+                    {% endfor %}
+                </div>
             </div>
+
         </div>
         <div class="post_col">
             <!-- <div class="post_container">
@@ -155,27 +172,21 @@
             </div> -->
 
             <div class="post_container shadow-sm border-1 rounded-4">
-                    <!-- Trigger Card -->
-                
-                    <div class="user_profile">
-                        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
-                        <div>
+                <!-- Trigger Card -->
+
+                <div class="user_profile">
+                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <div>
                         <p>{{ profile.username }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
-                        </div>
                     </div>
-                    <div class="mt-4">
+                </div>
+                <div class="mt-4">
 
-                        <textarea
-                        class="w-full p-2 border rounded-md bg-gray-100 resize-none"
-                        name="content"
-                        placeholder="What's on your mind?"
-                        rows="3"
-                        onclick="openModal()"
-                        required
-                        ></textarea>
+                    <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
+                        placeholder="What's on your mind?" rows="3" onclick="openModal()" required></textarea>
 
-                        <div class="flex justify-between mt-3 text-sm text-blue-500 font-semibold">
+                    <div class="flex justify-between mt-3 text-sm text-blue-500 font-semibold">
                         <a onclick="openModal()" class="flex items-center space-x-1">
                             <i class="fas fa-video text-red-500"></i>
                             <span>Live Video</span>
@@ -188,88 +199,96 @@
                             <i class="fas fa-smile text-yellow-500"></i>
                             <span>Feeling/Activity</span>
                         </a>
-                        </div>
-
-                    </div>
-                    
-
-                    <!-- Post Modal -->
-                    <div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-                    <div class="bg-white w-full max-w-lg rounded-xl p-4">
-                        <div class="flex justify-between items-center border-b pb-3 mb-3">
-                        <h2 class="text-xl font-bold">Drop</h2>
-                        <button onclick="closeModal()" class="text-gray-500 hover:text-black text-xl">&times;</button>
-                        </div>
-
-                        <div class="flex items-center space-x-3 mb-4">
-                        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="w-10 h-10 rounded-full"/>
-                        <div>
-                            <p>{{ profile.username }}</p>
-                        <small>Public <i class="fa fa-caret-down"></i></small>
-                        </div>
-                        </div>
-
-                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <input type="hidden" name="profile_id" value="{{ profile.id }}">
-
-                        
-                        <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content" placeholder="What's on your mind?" rows="2" required></textarea>
-                        <br>
-
-                        <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
-                        <input type="text" name="caption" placeholder="Caption (optional)" class="form-control mb-2">
-                        <input type="file" name="media_files" multiple class="form-control mb-2">
-                        <button type="submit" class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
-                        </form>
-                    </div>
                     </div>
 
                 </div>
-            {% for post in posts %}
-                <div class="post_container shadow-sm border-1 rounded-4">
-                    <div class="post_row">
-                        <div class="user_profile">
-                            <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
+
+
+                <!-- Post Modal -->
+                <div id="postModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+                    <div class="bg-white w-full max-w-lg rounded-xl p-4">
+                        <div class="flex justify-between items-center border-b pb-3 mb-3">
+                            <h2 class="text-xl font-bold">Drop</h2>
+                            <button onclick="closeModal()"
+                                class="text-gray-500 hover:text-black text-xl">&times;</button>
+                        </div>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                            <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile"
+                                class="w-10 h-10 rounded-full" />
                             <div>
-                                <p>{{ post.username }}</p>
-                                <span>{{ post.created_at}}</span>
-                                <span>{{ post.visibility}}</span>
+                                <p>{{ profile.username }}</p>
+                                <small>Public <i class="fa fa-caret-down"></i></small>
                             </div>
                         </div>
-                        <div class="dropdown text-end">
-                            <a href="#" class="text-dark" id="dropdownMenuLink{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ post.id }}">
-                                <li>
-                                    <a href="#" class="dropdown-item"data-post-id="{{ post.id }}"onclick="handleDeleteClick(this, event)">Delete</a>
-                                </li>
-                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
-                            </ul>
+
+                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+
+                            <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
+                                placeholder="What's on your mind?" rows="2" required></textarea>
+                            <br>
+
+                            <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
+                            <input type="text" name="caption" placeholder="Caption (optional)"
+                                class="form-control mb-2">
+                            <input type="file" name="media_files" multiple class="form-control mb-2">
+                            <button type="submit"
+                                class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            {% for post in posts %}
+            <div class="post_container shadow-sm border-1 rounded-4">
+                <div class="post_row">
+                    <div class="user_profile">
+                        <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
+                        <div>
+                            <p>{{ post.username }}</p>
+                            <span>{{ post.created_at}}</span>
+                            <span>{{ post.visibility}}</span>
                         </div>
                     </div>
-                    {% if post.title %}
-                        <p class="post_text">{{ post.title }}</p>
-                    {% endif %}
-                    {% if post.caption %}
-                        <p class="post_text">{{ post.caption }}</p>
-                    {% endif %}
-                                            {% if post.media %}
-                            {% for media_item in post.media %}
-                                {% with media_item|lower as f %}
-                                    {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
-                                        <img src="{{ media_item }}" alt="Feedback" class="post_img">
-                                    {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
-                                        <video controls class="post_img fixed-post-img">
-                                            <source src="{{ media_item }}" type="video/mp4">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    {% endif %}
-                                {% endwith %}
-                            {% endfor %}
-                        {% endif %}
-                    <!-- <div class="post_row">
+                    <div class="dropdown text-end">
+                        <a href="#" class="text-dark" id="dropdownMenuLink{{ post.id }}" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="fa fa-ellipsis-v"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ post.id }}">
+                            <li>
+                                <a href="#" class="dropdown-item" data-post-id="{{ post.id }}"
+                                    onclick="handleDeleteClick(this, event)">Delete</a>
+                            </li>
+                            <li><a class="dropdown-item" href="#">Hide Post</a></li>
+                        </ul>
+                    </div>
+                </div>
+                {% if post.title %}
+                <p class="post_text">{{ post.title }}</p>
+                {% endif %}
+                {% if post.caption %}
+                <p class="post_text">{{ post.caption }}</p>
+                {% endif %}
+                {% if post.media %}
+                {% for media_item in post.media %}
+                {% with media_item|lower as f %}
+                {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+                <img src="{{ media_item }}" alt="Feedback" class="post_img">
+                {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                <video controls class="post_img fixed-post-img">
+                    <source src="{{ media_item }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
+                {% endwith %}
+                {% endfor %}
+                {% endif %}
+                <!-- <div class="post_row">
                         <div class="activity_icon">
                             <div><img src="{% static 'images/like-blue.png' %}" alt="Like"> {{ post.reaction_count }}</div>
                             <div><img src="{% static 'images/comments.png' %}" alt="Comments"> {{ post.comment_count }}</div>
@@ -279,7 +298,7 @@
                             <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
                         </div>
                     </div> -->
-                </div>
+            </div>
             {% endfor %}
 
         </div>
@@ -290,9 +309,9 @@
 <script src="{% static 'js/edit_profile.js' %}"></script>
 <script src="{% static 'js/into.js' %}"></script>
 <script>
-function openModal() {
-    document.getElementById('postModal').classList.remove('hidden');
-    document.getElementById('postModal').classList.add('flex');
+    function openModal() {
+        document.getElementById('postModal').classList.remove('hidden');
+        document.getElementById('postModal').classList.add('flex');
     }
 
     function closeModal() {
@@ -300,101 +319,95 @@ function openModal() {
     }
 </script>
 <script>
-  async function fetchPendingRequests() {
-    const list = document.getElementById("friendRequestsList");
-    list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
+    async function fetchPendingRequests() {
+        const list = document.getElementById("friendRequestsList");
+        list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
 
-    try {
-      const res = await fetch("http://127.0.0.1:8001/profile/pending-friend-requests/", {
-        headers: {
-          "Authorization": "Bearer {{ request.session.access }}",
-        }
-      });
-      const result = await res.json();
+        try {
+            const res = await fetch("http://127.0.0.1:8001/profile/pending-friend-requests/", {
+                headers: {
+                    "Authorization": "Bearer {{ request.session.access }}",
+                }
+            });
+            const result = await res.json();
 
-      if (!result.status || result.data.length === 0) {
-        list.innerHTML = '<li class="text-muted px-3">No friend requests</li>';
-        return;
-      }
+            if (!result.status || result.data.length === 0) {
+                list.innerHTML = '<li class="text-muted px-3">No friend requests</li>';
+                return;
+            }
 
-      list.innerHTML = "";
+            list.innerHTML = "";
 
-      result.data.forEach(req => {
-        const li = document.createElement("li");
-        li.classList.add("friend-request-item");
+            result.data.forEach(req => {
+                const li = document.createElement("li");
+                li.classList.add("friend-request-item");
 
-        li.innerHTML = `
+                li.innerHTML = `
           <div class="d-flex align-items-center gap-2">
             <img src="http://127.0.0.1:8001${req.from_profile_pic}" alt="Profile" />
             <span>${req.from_username}</span>
           </div>
           <div class="btn-group btn-group-sm">
-            ${
-              req.is_sent_by_current_user
-                ? `<button class="btn btn-warning" onclick="cancelFriendRequest(${req.id})">Cancel</button>`
-                : `
+            ${req.is_sent_by_current_user
+                        ? `<button class="btn btn-warning" onclick="cancelFriendRequest(${req.id})">Cancel</button>`
+                        : `
                   <button class="btn btn-success" onclick="respondFriendRequest(${req.id}, 'accept')">✓</button>
                   <button class="btn btn-danger" onclick="respondFriendRequest(${req.id}, 'reject')">✕</button>
                 `
-            }
+                    }
           </div>
         `;
 
-        list.appendChild(li);
-      });
+                list.appendChild(li);
+            });
 
-    } catch (err) {
-      console.error("Failed to fetch requests", err);
-      list.innerHTML = '<li class="text-danger px-3">Error loading requests</li>';
+        } catch (err) {
+            console.error("Failed to fetch requests", err);
+            list.innerHTML = '<li class="text-danger px-3">Error loading requests</li>';
+        }
     }
-  }
 
-  async function respondFriendRequest(requestId, action) {
-    try {
-      const response = await fetch("http://127.0.0.1:8001/profile/respond-friend-request/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer {{ request.session.access }}"
-        },
-        body: JSON.stringify({ request_id: requestId, action: action })
-      });
+    async function respondFriendRequest(requestId, action) {
+        try {
+            const response = await fetch("http://127.0.0.1:8001/profile/respond-friend-request/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer {{ request.session.access }}"
+                },
+                body: JSON.stringify({ request_id: requestId, action: action })
+            });
 
-      const result = await response.json();
-      alert(result.status ? `Request ${action}ed.` : result.message);
-      fetchPendingRequests();
-    } catch (err) {
-      console.error("Respond error:", err);
-      alert("Something went wrong.");
+            const result = await response.json();
+            alert(result.status ? `Request ${action}ed.` : result.message);
+            fetchPendingRequests();
+        } catch (err) {
+            console.error("Respond error:", err);
+            alert("Something went wrong.");
+        }
     }
-  }
 
-  async function cancelFriendRequest(requestId) {
-    try {
-      const response = await fetch("http://127.0.0.1:8001/profile/cancel-friend-request/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer {{ request.session.access }}"
-        },
-        body: JSON.stringify({ request_id: requestId })
-      });
+    async function cancelFriendRequest(requestId) {
+        try {
+            const response = await fetch("http://127.0.0.1:8001/profile/cancel-friend-request/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer {{ request.session.access }}"
+                },
+                body: JSON.stringify({ request_id: requestId })
+            });
 
-      const result = await response.json();
-      alert(result.status ? "Friend request canceled." : result.message);
-      fetchPendingRequests();
-    } catch (err) {
-      console.error("Cancel error:", err);
-      alert("Something went wrong.");
+            const result = await response.json();
+            alert(result.status ? "Friend request canceled." : result.message);
+            fetchPendingRequests();
+        } catch (err) {
+            console.error("Cancel error:", err);
+            alert("Something went wrong.");
+        }
     }
-  }
 
-  document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
+    document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
 </script>
 
 {% endblock %}
-
-
-
-
-

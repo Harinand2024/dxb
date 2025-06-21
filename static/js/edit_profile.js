@@ -1,6 +1,8 @@
 let cropper = null;
 let currentCropType = null;
-let accessToken = profile_container.dataset.accessToken;
+// let accessToken = profile_container.dataset.accessToken;
+let accessToken = null; // Global access token placeholder
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // Elements
@@ -382,30 +384,113 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle info form submit
     const infoForm = document.getElementById('infoForm');
 
+    // if (infoForm) {
+    //     infoForm.addEventListener('submit', function (e) {
+    //         e.preventDefault();
+    //         const formData = new FormData(infoForm);
+
+    //         const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
+    //                         getProfileIdFromUrl();
+
+    //         if (!profileId) {
+    //             showNotification('Profile ID not found. Please refresh the page.', 'error');
+    //             return;
+    //         }
+
+    //         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+    //                         getCookie('csrftoken');
+
+    //         if (csrfToken) {
+    //             formData.append('csrfmiddlewaretoken', csrfToken);
+    //         }
+
+    //         const headers = {
+    //             'X-Requested-With': 'XMLHttpRequest',
+    //             'Authorization': `Bearer ${accessToken}`
+    //         };
+
+    //         if (csrfToken) {
+    //             headers['X-CSRFToken'] = csrfToken;
+    //         }
+
+    //         fetch(`http://127.0.0.1:8001/profile/profile/${profileId}/`, {
+    //             method: 'PUT',
+    //             body: formData,
+    //             headers: {'Authorization': `Bearer ${accessToken}`,
+    //             credentials: 'include'}
+    //         })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 return response.text().then(text => {
+    //                     throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+    //                 });
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             showNotification('Profile info updated successfully!', 'success');
+
+    //             const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
+    //             if (modal) modal.hide();
+
+    //             if (data.username) {
+    //                 const usernameElements = document.querySelectorAll('h3:first-child, p:first-child');
+    //                 usernameElements.forEach(el => {
+    //                     if (el.textContent.includes(data.username)) {
+    //                         el.textContent = data.username;
+    //                     }
+    //                 });
+    //             }
+
+    //             setTimeout(() => location.reload(), 2000);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error updating profile:', error);
+
+    //             if (error.message.includes('401')) {
+    //                 showNotification('Authentication failed. Please log in again.', 'error');
+    //             } else if (error.message.includes('403')) {
+    //                 showNotification('You do not have permission to update this profile.', 'error');
+    //             } else {
+    //                 showNotification('Failed to update profile info. Please try again.', 'error');
+    //             }
+    //         });
+    //     });
+    // }
+
+    if (infoForm) {
+    const infoForm = document.getElementById('infoForm');
+    const profileContainer = document.querySelector('.profile_container');
+
+    if (profileContainer) {
+        accessToken = profileContainer.dataset.accessToken || '';
+    }
+
     if (infoForm) {
         infoForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
             const formData = new FormData(infoForm);
 
-            const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
-                            getProfileIdFromUrl();
+            const profileId = profileContainer?.dataset.profileId || getProfileIdFromUrl();
 
             if (!profileId) {
                 showNotification('Profile ID not found. Please refresh the page.', 'error');
                 return;
             }
 
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                            getCookie('csrftoken');
-
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
             if (csrfToken) {
                 formData.append('csrfmiddlewaretoken', csrfToken);
             }
 
             const headers = {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${accessToken}`
+                'X-Requested-With': 'XMLHttpRequest'
             };
+
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
 
             if (csrfToken) {
                 headers['X-CSRFToken'] = csrfToken;
@@ -415,46 +500,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'PUT',
                 body: formData,
                 headers: headers,
-                credentials: 'include'
+                credentials: 'include' // Must be outside headers
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                showNotification('Profile info updated successfully!', 'success');
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Profile info updated successfully!', 'success');
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
-                if (modal) modal.hide();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
+                    if (modal) modal.hide();
 
-                if (data.username) {
-                    const usernameElements = document.querySelectorAll('h3:first-child, p:first-child');
-                    usernameElements.forEach(el => {
-                        if (el.textContent.includes(data.username)) {
+                    // Update username on UI immediately
+                    if (data.username) {
+                        document.querySelectorAll('[data-username-display]').forEach(el => {
                             el.textContent = data.username;
-                        }
-                    });
-                }
+                        });
+                    }
 
-                setTimeout(() => location.reload(), 2000);
-            })
-            .catch(error => {
-                console.error('Error updating profile:', error);
+                    setTimeout(() => location.reload(), 2000);
+                })
+                .catch(error => {
+                    console.error('Error updating profile:', error);
 
-                if (error.message.includes('401')) {
-                    showNotification('Authentication failed. Please log in again.', 'error');
-                } else if (error.message.includes('403')) {
-                    showNotification('You do not have permission to update this profile.', 'error');
-                } else {
-                    showNotification('Failed to update profile info. Please try again.', 'error');
-                }
-            });
+                    if (error.message.includes('401')) {
+                        showNotification('Authentication failed. Please log in again.', 'error');
+                    } else if (error.message.includes('403')) {
+                        showNotification('You do not have permission to update this profile.', 'error');
+                    } else {
+                        showNotification('Failed to update profile info. Please try again.', 'error');
+                    }
+                });
         });
     }
+}
+
 
 
     // Utility function to show notifications
@@ -784,8 +869,9 @@ function handleDeleteClick(el, event) {
   event.preventDefault();
 
   const postId = el.dataset.postId;
-  const introContainer = document.getElementById('introContainer');
-  const accessToken = introContainer ? introContainer.dataset.accessToken : null;
+  // const introContainer = document.getElementById('introContainer');
+const accessToken = document.getElementById('introContainer')?.dataset.accessToken;
+    console.log("Token used:", accessToken);
 
   if (!postId || !accessToken) {
     console.error("Missing postId or accessToken", { postId, accessToken });

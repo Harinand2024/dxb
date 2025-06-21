@@ -208,6 +208,38 @@ def dashboard_view(request):
             print("Photo fetch failed:", photos_response.status_code)
     except Exception as e:
         print("Photo fetch error:", str(e))
+    canvas_images = []
+    try:
+        canvas_url = f'http://127.0.0.1:8001/profile/canvas/{profile_id}/'
+        canvas_response = requests.get(canvas_url, headers=headers)
+        if canvas_response.status_code == 200:
+            canvas_data = canvas_response.json().get('data', [])
+            for item in canvas_data:
+                image_url = item.get('image')
+                if image_url:
+                    canvas_images.append(f"http://127.0.0.1:8001{image_url}")
+        else:
+            print("Canvas fetch failed:", canvas_response.status_code)
+    except Exception as e:
+        print("Canvas fetch error:", str(e))
+    friends = []
+    try:
+        friends_url = f'http://127.0.0.1:8001/profile/friends-list/{profile_id}/'
+        friends_response = requests.get(friends_url, headers=headers)
+        if friends_response.status_code == 200:
+            friends_data = friends_response.json().get('data', [])
+            for friend in friends_data:
+                friends.append({
+                    'id': friend.get('id'),
+                    'name': friend.get('username'),
+                    'image': f"http://127.0.0.1:8001{friend.get('profile_pic')}" if friend.get('profile_pic') else '/static/images/profile-pic.png'
+                })
+        else:
+            print("Friend list fetch failed:", friends_response.status_code)
+    except Exception as e:
+        print("Friend list fetch error:", str(e))
+
+
 
 
 
@@ -218,7 +250,9 @@ def dashboard_view(request):
         'email': request.session.get('email'),
         'photos': photos,
         'posts': posts,
-        'intro_sections': intro_sections
+        'intro_sections': intro_sections,
+        'canvas_images': canvas_images,
+        'friends': friends
     })
 
 
