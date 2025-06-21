@@ -49,7 +49,7 @@
                         <h3 contenteditable="true" onblur="updateIntroSectionTitle(this)">
                             {{ intro_section.title|default:"Untitled Section" }}
                         </h3>
-                        <button class="btn btn-sm btn-danger" onclick="removeSectionField(this)" title="Delete Section">
+                        <button class="" onclick="removeSectionField(this)" title="Delete Section">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -75,15 +75,14 @@
                         <input type="text" class="form-control me-2 newFieldInput"
                             placeholder="Add custom intro line..." />
                         <button class="btn btn-outline-art" onclick="addIntroField(this)"
-                            style="background-color: #f80c9a; color: #ffffff;">
+                            style="background-color: #b0aaaa; color: #ffffff;">
                             <i class="fas fa-plus-circle"></i>
                         </button>
                     </div>
 
                     <!-- Save Section -->
                     <div class="mt-3">
-                        <button class="btn btn-outline-art btn-sm w-100"
-                            style="background-color: #f80c9a; color: #ffffff;"
+                        <button class="btn btn-light btn-sm w-100"
                             onclick="saveFields(this.closest('.profile_intro'))">
                             Save
                         </button>
@@ -93,8 +92,7 @@
             </div>
             <!-- Add More Sections -->
             <div class="text-center">
-                <button class="btn btn-art btn-sm w-100 mb-3" onclick="addNewIntroSection()"
-                    style="background-color: #030dff; color: #ffffff;">
+                <button class="btn btn-light btn-sm w-100 mb-3" onclick="addNewIntroSection()">
                     <i class="fas fa-plus"></i> Add More Sections
                 </button>
             </div>
@@ -373,6 +371,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{% static 'js/edit_profile.js' %}"></script>
 <script src="{% static 'js/into.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
 <script>
     function openModal() {
         document.getElementById('postModal').classList.remove('hidden');
