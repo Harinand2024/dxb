@@ -394,7 +394,8 @@ def profile_dashboard_view(request, profile_id):
             'id': section['id'],
             'title': section['title'],
             'display_order': section['display_order'],
-            'fields': section.get('fields', [])
+            'fields': section.get('fields', []),
+
         })
 
     # === 3. Posts ===
@@ -402,7 +403,7 @@ def profile_dashboard_view(request, profile_id):
         posts_url = f'{base_url}/media/profile-posts/profile-id/{profile_id}/'
         posts_response = requests.get(posts_url, headers=headers)
         posts_json = posts_response.json()
-
+        friend_status = profile_data.get('friend_request_status', 'not_sent')
         if posts_response.status_code == 200:
             posts_data = posts_json.get('data', [])
             data['posts'] = [{
@@ -474,7 +475,8 @@ def profile_dashboard_view(request, profile_id):
         'posts': data['posts'],
         'photos': data['photos'],
         'canvas_images': canvas_images,
-        'friends': friends
+        'friends': friends,
+        'friend_status': friend_status,
     })
 
 

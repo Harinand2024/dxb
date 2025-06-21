@@ -27,7 +27,7 @@
           </div> -->
           <div class="profile-img-wrapper position-relative d-inline-block">
             <img
-              src="{% if profile.profile_picture %}http://127.0.0.1:8001{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}"
+              src="{% if profile.profile_picture %}{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}"
               alt="Profile" class="pd_image">
             <label for="profileUpload" class="camera-icon">
               <i class="fas fa-camera"></i>
@@ -186,7 +186,7 @@
               </ul>
             </div>
           <div class="nav_user_icon position-relative" onclick="settingsMenuToggle()" style="cursor: pointer;">
-            <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
+            <img src="{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
               alt="Profile" style="height: 40px; width: 40px; object-fit: cover;">
             <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white"
               style="width: 10px; height: 10px;"></span>
@@ -289,7 +289,7 @@
                             <button class="dropdown-item d-flex align-items-center gap-2" id="uploadBtn">
                             <i class="fas fa-upload"></i> Upload photo
                           </button>
-                            <input type="file" id="uploadBtn" accept="image/*" style="display: none;">
+                            <input type="file" id="coverUpload" accept="image/*" style="display: none;">
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
@@ -303,6 +303,23 @@
     </div>
 
 
+  </div>
+</div>
+<!-- Cropper Modal -->
+<div class="modal fade" id="coverCropModal" tabindex="-1" aria-labelledby="coverCropModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="coverCropModalLabel">Crop Cover Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="coverCropImage" src="" style="max-width: 100%; max-height: 500px;" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="confirmCropBtn">Upload</button>
+      </div>
+    </div>
   </div>
 </div>
 

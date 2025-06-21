@@ -13,6 +13,93 @@
 <script src="{% static 'js/into.js' %}"></script>
 <script src="{% static 'js/script.js' %}"></script>
 <script>
+let cropper;
+
+document.addEventListener("DOMContentLoaded", function () {
+  const uploadBtn = document.getElementById("uploadBtn");
+  const coverUpload = document.getElementById("coverUpload");
+  const cropImage = document.getElementById("coverCropImage");
+  const confirmCropBtn = document.getElementById("confirmCropBtn");
+  const cropModalEl = document.getElementById("coverCropModal");
+  const cropModal = new bootstrap.Modal(cropModalEl);
+
+  if (uploadBtn && coverUpload) {
+    // Open file dialog
+    uploadBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      coverUpload.click();
+    });
+
+    // Handle file change
+    coverUpload.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        cropImage.src = evt.target.result;
+
+        cropImage.onload = function () {
+          if (cropper) cropper.destroy();
+
+          cropper = new Cropper(cropImage, {
+            aspectRatio: 16 / 9,
+            viewMode: 1,
+            autoCropArea: 1,
+            cropBoxResizable: false,
+            movable: true,
+            zoomable: true,
+            background: false,
+          });
+
+          cropModal.show();
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Confirm crop and upload
+    confirmCropBtn.addEventListener("click", function () {
+      if (!cropper) return;
+
+      cropper.getCroppedCanvas().toBlob(function (blob) {
+        const formData = new FormData();
+        formData.append("image", blob, "canvas_cropped.jpg");
+
+        const accessToken = "{{ request.session.access }}";
+
+        fetch("http://127.0.0.1:8001/profile/canvas/", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: formData,
+          credentials: "include"
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              alert("Image uploaded successfully!");
+              location.reload();
+            } else {
+              alert("Upload failed.");
+            }
+          })
+          .catch(err => {
+            console.error("Upload error:", err);
+            alert("Something went wrong.");
+          });
+
+        cropModal.hide();
+      }, "image/jpeg");
+    });
+  }
+});
+</script>
+
+<script>
+
 function openModal() {
     document.getElementById('postModal').classList.remove('hidden');
     document.getElementById('postModal').classList.add('flex');

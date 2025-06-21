@@ -238,7 +238,7 @@
                 <!-- Trigger Card -->
 
                 <div class="user_profile">
-                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
                     <div>
                         <p>{{ profile.username }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
@@ -278,7 +278,7 @@
                         </div>
 
                         <div class="flex items-center space-x-3 mb-4">
-                            <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile"
+                            <img src="{{ profile.profile_picture }}" alt="Profile"
                                 class="w-10 h-10 rounded-full" />
                             <div>
                                 <p>{{ profile.username }}</p>
@@ -310,7 +310,7 @@
             <div class="post_container shadow-sm border-1 rounded-4">
                 <div class="post_row">
                     <div class="user_profile">
-                        <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
+                        <img src="{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
                         <div>
                             <p>{{ post.username }}</p>
                             <span>{{ post.created_at}}</span>
@@ -358,7 +358,7 @@
                             <div><img src="{% static 'images/share.png' %}" alt="Share"> {{ post.share_count }}</div>
                         </div>
                         <div class="post_profile_icon">
-                            <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
+                            <img src="{{ post.profile_picture }}" alt="Profile Pic"> <i class="fa fa-caret-down"></i>
                         </div>
                     </div> -->
             </div>

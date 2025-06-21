@@ -50,7 +50,7 @@
             </ul>
            
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
-                <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="profile">
+                <img src="{{ profile.profile_picture }}" alt="profile">
             </div>
         </div>
         <!-- todo: setting menu -->
@@ -62,7 +62,7 @@
 
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
                     <div>
                         <p>{{ profile.username }}</p>
                         <a href="{% url 'dashboard' %}">See Your Profile</a>
