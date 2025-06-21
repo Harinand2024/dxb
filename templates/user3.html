@@ -37,9 +37,8 @@
                 </button>
                 </div>
             </div> -->
-            <div id="introContainer"
-                    data-profile-id="{{ profile.id }}"
-                    data-access-token="{{ request.session.access }}">
+            <div id="introContainer" data-profile-id="{{ profile.id }}"
+                data-access-token="{{ request.session.access }}">
 
                 {% for intro_section in intro_sections %}
                 <div class="profile_intro border rounded p-3 mb-3" id="intro_section"
@@ -103,7 +102,7 @@
             <div class="profile_intro">
                 <div class="title_box">
                     <h3>Photos</h3>
-                    <a href="gallery-new.html">All Photos</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">All Photos</a>
                 </div>
                 <div class="photo_box">
                     {% for photo in photos|slice:":6" %}
@@ -120,7 +119,7 @@
             <div class="profile_intro">
                 <div class="title_box d-flex justify-content-between align-items-center">
                     <h3>Friends</h3>
-                    <a href="">All Friends</a> <!-- Replace with real URL name -->
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">All Friends</a>
                 </div>
 
                 <div class="row row-cols-3 g-2 mt-2">
@@ -136,7 +135,73 @@
                 </div>
             </div>
 
+
         </div>
+        <!-- Photo Gallery Modal -->
+        <div class="modal fade" id="photoGalleryModal" tabindex="-1" aria-labelledby="photoGalleryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="photoGalleryModalLabel">Photo Gallery</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- Large Preview -->
+                        <div class="text-center mb-4">
+                            <img id="mainPreviewImage" src="{{ photos.0 }}" class="img-fluid rounded shadow"
+                                style="max-height: 400px; object-fit: contain;">
+                        </div>
+
+                        <!-- Thumbnail Gallery -->
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            {% for photo in photos %}
+                            <img src="{{ photo }}" class="img-thumbnail border border-secondary"
+                                style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
+                                onclick="updatePreview(this)">
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Friends Modal -->
+        <div class="modal fade" id="friendsModal" tabindex="-1" aria-labelledby="friendsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="friendsModalLabel">All Friends</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        {% if friends %}
+                        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                            {% for friend in friends %}
+                            <div class="col text-center">
+                                <img src="{{ friend.image }}" class="rounded-circle shadow-sm" alt="{{ friend.name }}"
+                                    width="80" height="80">
+                                <a href="{% url 'profile-dashboard-api' friend.id %}" class="text-decoration-none text-dark" >
+                                    <p class="mt-2 fw-medium">{{ friend.name }}</p>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted text-center">No friends found.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
         <div class="post_col">
             <!-- <div class="post_container">
                 <div class="user_profile">

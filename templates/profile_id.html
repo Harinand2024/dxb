@@ -209,10 +209,9 @@
                     <h3>
                         {{ profile.username }}
                     </h3>
-                    <p>{{ profile.friends|length }} Friends - {{ profile.followers_count|length }} Followers - Following: {{ profile.following_count|length }}</p>
-                    {% for friend in profile.friends|slice:":4" %}
-                        <img src="{% static friend.image %}" alt="{{ friend.name }}">
-                    {% endfor %}
+                    <p class="text-muted small">
+            {{ profile.friends_count }} Friends – {{ profile.followers_count }} Followers – Following: {{ profile.following_count }}
+          </p>
                     <p>{{profile.bio}}</p>
                 </div>
                 
@@ -254,9 +253,7 @@
                             <!-- CORRECT -->
                                 <li class="d-flex align-items-center mb-2" data-field-id="{{ field.id }}">
                                     <span contenteditable="true">{{ field.field_name }}</span>
-                                    <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+
                                 </li>
 
                             {% endfor %}
@@ -268,26 +265,108 @@
             <div class="profile_intro">
                 <div class="title_box">
                     <h3>Photos</h3>
-                    <a href="gallery-new.html">All Photos</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">All Photos</a>
                 </div>
                 <div class="photo_box">
                     {% for photo in photos|slice:":6" %}
-                        <div>
-                            <img src="{{ photo }}" alt="Photo" class="img-fluid" style="object-fit: cover;width: 100px;height: 100px;">
-                        </div>
+                    <div>
+                        <img src="{{ photo }}" alt="Photo" class="img-fluid"
+                            style="object-fit: cover;width: 100px;height: 100px;">
+                    </div>
                     {% empty %}
-                        <p>No photos uploaded yet.</p>
+                    <p>No photos uploaded yet.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="profile_intro">
-                <div class="title_box">
-                    <h3>Freinds</h3>
-                    <a href="allfriends-new.html">All Freinds</a>
+                <div class="title_box d-flex justify-content-between align-items-center">
+                    <h3>Friends</h3>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">All Friends</a>
                 </div>
-                <p>120 (10 mutal)</p>
-  
+
+                <div class="row row-cols-3 g-2 mt-2">
+                    {% for friend in friends|slice:":6" %}
+                    <div class="col text-center">
+                        <img src="{{ friend.image }}" class="rounded-circle" alt="{{ friend.name }}" width="60"
+                            height="60">
+                        <p class="small mt-1">{{ friend.name }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No friends found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+        </div>
+        <!-- Photo Gallery Modal -->
+        <div class="modal fade" id="photoGalleryModal" tabindex="-1" aria-labelledby="photoGalleryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="photoGalleryModalLabel">Photo Gallery</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <!-- Large Preview -->
+                        <div class="text-center mb-4">
+                            <img id="mainPreviewImage" src="{{ photos.0 }}" class="img-fluid rounded shadow"
+                                style="max-height: 400px; object-fit: contain;">
+                        </div>
+
+                        <!-- Thumbnail Gallery -->
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            {% for photo in photos %}
+                            <img src="{{ photo }}" class="img-thumbnail border border-secondary"
+                                style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
+                                onclick="updatePreview(this)">
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Friends Modal -->
+        <div class="modal fade" id="friendsModal" tabindex="-1" aria-labelledby="friendsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="friendsModalLabel">All Friends</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        {% if friends %}
+                        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                            {% for friend in friends %}
+                            <div class="col text-center">
+                                <img src="{{ friend.image }}" class="rounded-circle shadow-sm" alt="{{ friend.name }}"
+                                    width="80" height="80">
+                                {% if friend.id == request.session.profile_id %}
+                                    <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                                {% else %}
+                                <a href="{% url 'profile-dashboard-api' friend.id %}" class="text-decoration-none text-dark" >
+                                    <p class="mt-2 fw-medium">{{ friend.name }}</p>
+                                
+                                {% endif %}
+                                    <p class="mb-0">{{ friend.name }}</p>
+                                    </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted text-center">No friends found.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
             </div>
         </div>
         <div class="post_col">
@@ -302,17 +381,7 @@
                                 <span>{{ post.visibility}}</span>
                             </div>
                         </div>
-                        <div class="dropdown text-end">
-                            <a href="#" class="text-dark" id="dropdownMenuLink{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ post.id }}">
-                                <li>
-                                    <a href="#" class="dropdown-item"data-post-id="{{ post.id }}"onclick="handleDeleteClick(this, event)">Delete</a>
-                                </li>
-                                <li><a class="dropdown-item" href="#">Hide Post</a></li>
-                            </ul>
-                        </div>
+          
                     </div>
                     {% if post.title %}
                         <p class="post_text">{{ post.title }}</p>

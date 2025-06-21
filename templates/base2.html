@@ -258,6 +258,15 @@ function openModal() {
 
   document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
 </script>
+<script>
+  function updatePreview(imgElement) {
+    const preview = document.getElementById('mainPreviewImage');
+    if (preview && imgElement.src) {
+      preview.src = imgElement.src;
+    }
+  }
+</script>
+
 </body>
 </html>
 

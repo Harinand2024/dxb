@@ -12,4 +12,5 @@ urlpatterns = [
     path('create-post/', create_post_view, name='create_post'),
     path('forgot-password/', forgot_password_view, name='forgot_password'),
     path('reset-password/', reset_password_page, name='reset_password_page'),
+    path('gallery/<int:profile_id>/', gallery_view, name='gallery_view'),
 ]

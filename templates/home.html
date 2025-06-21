@@ -74,45 +74,41 @@
                     </a>
                 </div>
             </div>
-            
+
 
         </div>
-        <div id="postModal"
-                    class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
-                    <div class="bg-white w-full max-w-lg rounded-xl p-4">
-                        <div class="flex justify-between items-center border-b pb-3 mb-3">
-                            <h2 class="text-xl font-bold">Drop</h2>
-                            <button onclick="closeModal()"
-                                class="text-gray-500 hover:text-black text-xl">&times;</button>
-                        </div>
+        <div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+            <div class="bg-white w-full max-w-lg rounded-xl p-4">
+                <div class="flex justify-between items-center border-b pb-3 mb-3">
+                    <h2 class="text-xl font-bold">Drop</h2>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-black text-xl">&times;</button>
+                </div>
 
-                        <div class="flex items-center space-x-3 mb-4">
-                            <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile"
-                                class="w-10 h-10 rounded-full" />
-                            <div>
-                                <p>{{ profile.username }}</p>
-                                <small>Public <i class="fa fa-caret-down"></i></small>
-                            </div>
-                        </div>
-
-                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
-
-
-                            <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
-                                placeholder="What's on your mind?" rows="2" required></textarea>
-                            <br>
-
-                            <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
-                            <input type="text" name="caption" placeholder="Caption (optional)"
-                                class="form-control mb-2">
-                            <input type="file" name="media_files" multiple class="form-control mb-2">
-                            <button type="submit"
-                                class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
-                        </form>
+                <div class="flex items-center space-x-3 mb-4">
+                    <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile"
+                        class="w-10 h-10 rounded-full" />
+                    <div>
+                        <p>{{ profile.username }}</p>
+                        <small>Public <i class="fa fa-caret-down"></i></small>
                     </div>
                 </div>
+
+                <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+
+                    <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
+                        placeholder="What's on your mind?" rows="2" required></textarea>
+                    <br>
+
+                    <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
+                    <input type="text" name="caption" placeholder="Caption (optional)" class="form-control mb-2">
+                    <input type="file" name="media_files" multiple class="form-control mb-2">
+                    <button type="submit" class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
+                </form>
+            </div>
+        </div>
 
         {% for post in posts %}
         <div class="post_container">
@@ -121,15 +117,15 @@
                     <img src="{{ post.profile_picture }}" alt="User">
                     <div>
                         {% if post.profile == request.session.profile_id %}
-                        <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
-                            {% else %}
-                            <a href="{% url 'profile-dashboard-api' post.profile %}"
-                                class="text-decoration-none text-dark">
-                                {% endif %}
-                                <p>{{ post.username }}</p>
+                            <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        {% else %}
+                            <a href="{% url 'profile-dashboard-api' post.profile %}" class="text-decoration-none text-dark">
+                        {% endif %}
+                            <p class="mb-0">{{ post.username }}</p>
                             </a>
-                            <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
+                        <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
                     </div>
+
 
                 </div>
                 <a href="#"><i class="fa fa-ellipsis-v"></i></a>

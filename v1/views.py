@@ -437,10 +437,62 @@ def profile_dashboard_view(request, profile_id):
             print(f"Photo fetch failed: {photos_response.status_code} - {photos_response.text}")
     except Exception as e:
         print(f"Photo fetch error: {e}")
+    canvas_images = []
+    try:
+        canvas_url = f'http://127.0.0.1:8001/profile/canvas/{profile_id}/'
+        canvas_response = requests.get(canvas_url, headers=headers)
+        if canvas_response.status_code == 200:
+            canvas_data = canvas_response.json().get('data', [])
+            for item in canvas_data:
+                image_url = item.get('image')
+                if image_url:
+                    canvas_images.append(f"http://127.0.0.1:8001{image_url}")
+        else:
+            print("Canvas fetch failed:", canvas_response.status_code)
+    except Exception as e:
+        print("Canvas fetch error:", str(e))
+    friends = []
+    try:
+        friends_url = f'http://127.0.0.1:8001/profile/friends-list/{profile_id}/'
+        friends_response = requests.get(friends_url, headers=headers)
+        if friends_response.status_code == 200:
+            friends_data = friends_response.json().get('data', [])
+            for friend in friends_data:
+                friends.append({
+                    'id': friend.get('id'),
+                    'name': friend.get('username'),
+                    'image': f"http://127.0.0.1:8001{friend.get('profile_pic')}" if friend.get('profile_pic') else '/static/images/profile-pic.png'
+                })
+        else:
+            print("Friend list fetch failed:", friends_response.status_code)
+    except Exception as e:
+        print("Friend list fetch error:", str(e))
 
     return render(request, 'profile_id.html', {
         'profile': data['profile'],
         'intro_sections': data['intro_sections'],
         'posts': data['posts'],
         'photos': data['photos'],
+        'canvas_images': canvas_images,
+        'friends': friends
     })
+
+
+def gallery_view(request, profile_id):
+    access_token = request.session.get('access')
+    headers = {'Authorization': f'Bearer {access_token}'}
+
+    photos = []
+    try:
+        url = f'http://127.0.0.1:8001/media/profile-images/profile-id/{profile_id}/'
+        res = requests.get(url, headers=headers)
+        if res.status_code == 200:
+            photos_data = res.json().get('data', [])
+            for item in photos_data:
+                file_url = item.get('file')
+                if file_url:
+                    photos.append(f"http://127.0.0.1:8001{file_url}")
+    except Exception as e:
+        print("Gallery fetch error:", str(e))
+
+    return render(request, 'gallery.html', {'photos': photos})

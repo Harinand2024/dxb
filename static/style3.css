@@ -1223,5 +1223,15 @@ footer {
 .modal {
   opacity: 1 !important;
 }
+.img-thumbnail:hover {
+border: 2px solid #0d6efd; /* Bootstrap primary color */
+transform: scale(1.05);
+transition: 0.2s ease;
+}
+#friendsModal img:hover {
+    transform: scale(1.05);
+    transition: 0.2s ease;
+    border: 2px solid #0d6efd;
+  }
 
 
