@@ -7,13 +7,13 @@
 <div class="container">
     <div class="left_sidebar">
         <div class="important_link">
-                <a href="#"><i class="fas fa-user-friends text-primary-art me-2"></i>Latest Friends</a>
-                <a href="#"><i class="bi bi-person-circle text-primary-art me-2"></i>Our Circle</a>
-                <!-- <a href="#"><i class="fas fa-users text-primary-art me-2"></i>Group</a>
+            <a href="#"><i class="fas fa-user-friends text-primary-art me-2"></i>Latest Friends</a>
+            <a href="#"><i class="bi bi-person-circle text-primary-art me-2"></i>Our Circle</a>
+            <!-- <a href="#"><i class="fas fa-users text-primary-art me-2"></i>Group</a>
                 <a href="#"><i class="fas fa-store text-primary-art me-2"></i>Marketplace</a>
                 <a href="#"><i class="fas fa-tv text-primary-art me-2"></i>Watch</a> -->
-                <a href="#">See More</a>
-            </div>
+            <a href="#">See More</a>
+        </div>
         <!-- <div class="shortcut_links">
             <p>Your Shortcuts</p>
             <a href="#"><img src="{% static 'images/shortcut-1.png' %}" alt="">Web Developers</a>
@@ -56,15 +56,63 @@
                 </div>
             </div>
             <div class="post_input_container">
-                <input id="input_value" placeholder="What's on Your Mind" />
-                <button id="button_value">Post</button>
-                <div class="add_post_link">
-                    <a href="#"><img src="{% static 'images/live-video.png' %}" alt="Live Video">Live Video</a>
-                    <a href="#"><img src="{% static 'images/photo.png' %}" alt="Photo/Video">Photo/Video</a>
-                    <a href="#"><img src="{% static 'images/feeling.png' %}" alt="Feeling/Activity">Feeling/Activity</a>
+                <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
+                    placeholder="What's on your mind?" rows="3" onclick="openModal()" required></textarea>
+
+                <div class="flex justify-between mt-3 text-sm text-blue-500 font-semibold">
+                    <a onclick="openModal()" class="flex items-center space-x-1">
+                        <i class="fas fa-video text-red-500"></i>
+                        <span>Live Video</span>
+                    </a>
+                    <a onclick="openModal()" class="flex items-center space-x-1">
+                        <i class="fas fa-image text-green-500"></i>
+                        <span>Photo/Video</span>
+                    </a>
+                    <a onclick="openModal()" class="flex items-center space-x-1">
+                        <i class="fas fa-smile text-yellow-500"></i>
+                        <span>Feeling/Activity</span>
+                    </a>
                 </div>
             </div>
+            
+
         </div>
+        <div id="postModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+                    <div class="bg-white w-full max-w-lg rounded-xl p-4">
+                        <div class="flex justify-between items-center border-b pb-3 mb-3">
+                            <h2 class="text-xl font-bold">Drop</h2>
+                            <button onclick="closeModal()"
+                                class="text-gray-500 hover:text-black text-xl">&times;</button>
+                        </div>
+
+                        <div class="flex items-center space-x-3 mb-4">
+                            <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile"
+                                class="w-10 h-10 rounded-full" />
+                            <div>
+                                <p>{{ profile.username }}</p>
+                                <small>Public <i class="fa fa-caret-down"></i></small>
+                            </div>
+                        </div>
+
+                        <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ profile.id }}">
+
+
+                            <textarea class="w-full p-2 border rounded-md bg-gray-100 resize-none" name="content"
+                                placeholder="What's on your mind?" rows="2" required></textarea>
+                            <br>
+
+                            <input type="text" name="title" placeholder="Title (optional)" class="form-control mb-2">
+                            <input type="text" name="caption" placeholder="Caption (optional)"
+                                class="form-control mb-2">
+                            <input type="file" name="media_files" multiple class="form-control mb-2">
+                            <button type="submit"
+                                class="mt-4 w-full btn-primary-art text-white py-2 rounded-lg ">Post</button>
+                        </form>
+                    </div>
+                </div>
 
         {% for post in posts %}
         <div class="post_container">
@@ -73,13 +121,14 @@
                     <img src="{{ post.profile_picture }}" alt="User">
                     <div>
                         {% if post.profile == request.session.profile_id %}
-                            <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
-                        {% else %}
-                            <a href="{% url 'profile-dashboard-api' post.profile %}" class="text-decoration-none text-dark">
-                        {% endif %}
-                            <p>{{ post.username }}</p>
-                        </a>
-                        <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                            {% else %}
+                            <a href="{% url 'profile-dashboard-api' post.profile %}"
+                                class="text-decoration-none text-dark">
+                                {% endif %}
+                                <p>{{ post.username }}</p>
+                            </a>
+                            <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
                     </div>
 
                 </div>
@@ -87,31 +136,31 @@
             </div>
 
             {% if post.title %}
-                <p class="post_text">{{ post.title }}</p>
+            <p class="post_text">{{ post.title }}</p>
             {% endif %}
             {% if post.caption %}
-                <p class="post_text">{{ post.caption }}</p>
+            <p class="post_text">{{ post.caption }}</p>
             {% endif %}
             {% if post.content %}
-                <p class="post_text">{{ post.content }}</p>
+            <p class="post_text">{{ post.content }}</p>
             {% endif %}
 
             {% for media_item in post.media %}
-                {% with media_item|lower as f %}
-                    {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
-                        <img src="{{ media_item }}" alt="Post Image" class="post_img">
-                    {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
-                        <video controls class="post_img">
-                            <source src="{{ media_item }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    {% elif ".mp3" in f or ".wav" in f %}
-                        <audio controls class="post_img">
-                            <source src="{{ media_item }}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    {% endif %}
-                {% endwith %}
+            {% with media_item|lower as f %}
+            {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+            <img src="{{ media_item }}" alt="Post Image" class="post_img">
+            {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+            <video controls class="post_img">
+                <source src="{{ media_item }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            {% elif ".mp3" in f or ".wav" in f %}
+            <audio controls class="post_img">
+                <source src="{{ media_item }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            {% endif %}
+            {% endwith %}
             {% endfor %}
 
             <!-- <div class="post_row">
