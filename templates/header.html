@@ -1,0 +1,302 @@
+{% load static %}
+<div class="profile_container shadow-sm rounded" data-profile-id="{{ profile.id }}">
+  <div class="row">
+
+    <!-- First Column (4 columns wide) -->
+
+    <div class="col-md-4">
+      <div class="card shadow-sm border-1 rounded-4 overflow-hidden" style="min-height: 100%;">
+
+        <!-- Profile Image -->
+        <div class="card-body text-center pt-4">
+          <div class="position-relative mx-auto" style="width: 120px; height: 120px;">
+            {% if profile.profile_picture %}
+            <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}"
+              class="rounded-circle img-thumbnail shadow-sm" style="width: 120px; height: 120px; object-fit: cover;"
+              alt="Profile">
+            {% else %}
+            <img src="{% static 'images/profile.png' %}" class="rounded-circle img-thumbnail shadow-sm"
+              style="width: 120px; height: 120px; object-fit: cover;" alt="Profile">
+            {% endif %}
+            <label for="profileUpload" class="position-absolute bottom-0 end-0 bg-light p-1 rounded-circle shadow-sm"
+              style="cursor: pointer;">
+              <i class="fas fa-camera text-dark"></i>
+            </label>
+          </div>
+
+          <!-- Username & Bio -->
+          <h4 class="mt-3 mb-1 fw-bold">
+            {{ profile.username }}
+            <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#editInfoModal">
+              <i class="fas fa-pencil-alt text-muted"></i>
+            </button>
+          </h4>
+          <p class="text-muted small">
+            {{ profile.followers_count }} Friends • {{ profile.followers_count|length }} Followers • Following: {{
+            profile.following_count|length }}
+          </p>
+          <p class="text-muted small">{{ profile.bio }}</p>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-center gap-2 flex-wrap my-3">
+            <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#editInfoModal">
+              <i class="fas fa-pencil-alt text-muted"></i>
+            </button>
+            <!-- Edit Info Modal -->
+            <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel"
+              aria-hidden="true" data-bs-backdrop="false">
+              <div class="modal-dialog">
+                <form id="infoForm" class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="editInfoModalLabel">Edit Profile Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                      <label for="username" class="form-label">Username</label>
+                      <input type="text" name="username" class="form-control" value="{{ profile.username }}">
+                    </div>
+                    <div class="mb-3">
+                      <label for="bio" class="form-label">Bio</label>
+                      <textarea name="bio" class="form-control">{{ profile.bio }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                      <label for="visibility_status" class="form-label">Visibility</label>
+                      <select name="visibility_status" class="form-select">
+                        <option value="public" {% if profile.visibility_status == "public" %}selected{% endif %}>Public</option>
+                        <option value="private" {% if profile.visibility_status == "private" %}selected{% endif %}>Private</option>
+                      </select>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary-art">Save</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <button class="btn rounded-2 btn-primary-art">
+              <i class="fas fa-user-plus me-2"></i>Circale
+            </button>
+            <button class="btn btn-art rounded-2 btn-primary-art">
+              <i class="fas fa-envelope me-2"></i>Message
+            </button>
+
+          </div>
+          <div class="dropdown mb-3">
+            <button class="btn btn-secondary fs-6 rounded-2 px-3 py-1">Silver Star Member</button>
+            <button class="btn rounded-2 dropdown-toggle float-end btn-primary-art" data-bs-toggle="dropdown">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Block</a></li>
+              <li><a class="dropdown-item" href="#">Report</a></li>
+              <li><a class="dropdown-item" href="#">Unfollow</a></li>
+            </ul>
+          </div>
+          <!-- Badge + Progress -->
+
+          <div class="progress my-2" style="height: 6px;">
+            <div class="progress-bar bg-purple" role="progressbar" style="width: 35%;" aria-valuenow="35"
+              aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="text-muted small">Level 2 of 5</p>
+
+          <div class="card mt-3 p-3 shadow-sm border-0 rounded-4">
+            <h5 class="mb-3 text-muted">🎨 Art Styles</h5>
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+              <span class="badge bg-primary rounded-pill px-3 py-2">Abstract</span>
+              <span class="badge bg-success rounded-pill px-3 py-2">Watercolor</span>
+              <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Minimalism</span>
+              <span class="badge bg-info text-dark rounded-pill px-3 py-2">Surrealism</span>
+              <span class="badge bg-danger rounded-pill px-3 py-2">Portrait</span>
+              <span class="badge bg-dark rounded-pill px-3 py-2">Modern Art</span>
+            </div>
+          </div>
+
+
+
+          <!-- Hidden Upload Inputs -->
+          <input type="file" id="profileUpload" name="profile_picture" hidden>
+          <input type="file" id="coverUpload" name="cover_picture" hidden>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Second Column (8 columns wide) -->
+    <div class="col-md-8">
+      <!-- Navigation Bar -->
+      <nav
+        class="d-flex justify-content-between align-items-center mb-3 shadow-lg border-1 rounded-4 nav-strong-shadow bg-light"
+        style=" color: white;">
+        <div class="d-flex align-items-center gap-3">
+          <a href="{% url 'home' %}">
+            <img src="{% static 'images/artdomain-logo.png' %}" alt="ADX Logo"
+              style="height: 56px; filter: drop-shadow(0 0 5px white);">
+          </a>
+
+          <div class="search_box position-relative">
+            <input type="search" class="form-control rounded-2 ps-5" placeholder="Search"
+              style="width: 280px; background-color: #f3f3f7;">
+            <img src="{% static 'images/search.png' %}" alt="search" class="position-absolute"
+              style="top: 50%; left: 15px; transform: translateY(-50%); height: 16px;">
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3" style="color: black;">
+          <i class="fas fa-bell fs-5" title="Notifications"></i>
+          <i class="fas fa-envelope fs-5" title="Inbox"></i>
+          <i class="fas fa-video fs-5" title="Videos"></i>
+          <div class="nav_user_icon position-relative" onclick="settingsMenuToggle()" style="cursor: pointer;">
+            <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
+              alt="Profile" style="height: 40px; width: 40px; object-fit: cover;">
+            <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white"
+              style="width: 10px; height: 10px;"></span>
+          </div>
+        </div>
+
+        <!-- Settings Dropdown Menu -->
+        <div class="setting_menu bg-white shadow rounded-4 p-3 position-absolute"
+          style="top: 60px; right: 10px; display: none; width: 300px;" id="settingsMenu">
+          <div class="user_profile d-flex align-items-center gap-3 mb-3">
+            <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
+              alt="Profile" style="height: 50px; width: 50px;">
+            <div>
+              <p class="fw-bold mb-0">{{ profile.username }}</p>
+              <a href="{% url 'dashboard' %}" class="text-muted small">See Your Profile</a>
+            </div>
+          </div>
+          <hr />
+          <div class="d-flex align-items-start gap-2 mb-2">
+            <img src="{% static 'images/feedback.png'%}" alt="" width="24">
+            <div>
+              <p class="fw-semibold mb-0">Give Feedback</p>
+              <small class="text-muted">Help us improve the new design</small>
+            </div>
+          </div>
+          <hr />
+          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
+            <div><img src="{% static 'images/setting.png'%}" width="20"> Setting & Privacy</div>
+            <img src="{% static 'images/arrow.png'%}" width="10">
+          </a>
+          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
+            <div><img src="{% static 'images/help.png'%}" width="20"> Help & Support</div>
+            <img src="{% static 'images/arrow.png'%}" width="10">
+          </a>
+          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
+            <div><img src="{% static 'images/display.png'%}" width="20"> Display & Accessibility</div>
+            <img src="{% static 'images/arrow.png'%}" width="10">
+          </a>
+          <a href="{% url 'logout' %}"
+            class="d-flex align-items-center justify-content-between text-decoration-none text-danger">
+            <div><img src="{% static 'images/logout.png'%}" width="20"> Logout</div>
+            <img src="{% static 'images/arrow.png'%}" width="10">
+          </a>
+        </div>
+      </nav>
+
+      <!-- Cover Section -->
+      <div class="container-fluid p-0">
+        <div class="cover-wrapper position-relative w-100 rounded-4 overflow-hidden shadow-sm">
+          <div id="coverCarousel" class="carousel slide rounded-4 shadow-sm overflow-hidden" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for i in "123"|make_list %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img
+                  src="{% if profile.cover_picture %}http://127.0.0.1:8001{{ profile.cover_picture }}{% else %}{% static 'images/cover.png' %}{% endif %}"
+                  class="d-block w-100" style="max-height: 500px; object-fit: cover;" alt="Cover {{ forloop.counter }}">
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Carousel Controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#coverCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#coverCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+
+          <!-- Edit Cover Button -->
+          <div class="position-absolute text-end me-3" style="right: 20px; bottom: 20px;">
+            <div class="dropdown">
+              <button class="btn btn-light d-flex align-items-center gap-2 px-3 py-1 rounded-pill shadow-sm"
+                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-camera"></i> Canvas
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                <li>
+                  <label class="dropdown-item d-flex align-items-center gap-2" for="coverUpload">
+                    <i class="fas fa-upload"></i> Upload photo
+                  </label>
+                  <input type="file" id="coverUpload" accept="image/*" style="display: none;">
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <a class="dropdown-item text-danger d-flex align-items-center gap-2" href="#">
+                    <i class="fas fa-trash"></i> Remove
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const infoForm = document.getElementById('infoForm');
+
+    if (infoForm) {
+      infoForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(infoForm);
+
+        const profileId = document.querySelector('.profile_container')?.dataset.profileId || null;
+
+        if (!profileId) {
+          alert('Profile ID not found. Please refresh the page.');
+          return;
+        }
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+        if (csrfToken) {
+          formData.append('csrfmiddlewaretoken', csrfToken);
+        }
+
+        fetch(`http://127.0.0.1:8001/profile/profile/${profileId}/`, {
+          method: 'PUT',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+          },
+          body: formData,
+          credentials: 'include'
+        })
+          .then(res => res.json())
+          .then(data => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
+            if (modal) modal.hide();
+            location.reload();
+          })
+          .catch(err => {
+            console.error('Error:', err);
+          });
+      });
+    }
+  });
+</script>

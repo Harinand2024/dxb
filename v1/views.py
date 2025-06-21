@@ -121,7 +121,6 @@ def dashboard_view(request):
         return redirect('login')
 
     access_token = request.session.get('access')
-    print(f"Session access token: {access_token}")
     profile_id = request.session.get('profile_id')
 
     if not profile_id:
@@ -213,7 +212,7 @@ def dashboard_view(request):
 
 
 
-    return render(request, 'user2.html', {
+    return render(request, 'user3.html', {
         'profile': profile_data,
         'username': request.session.get('username'),
         'email': request.session.get('email'),
@@ -327,9 +326,7 @@ def reset_password_page(request):
 
 
 def profile_dashboard_view(request, profile_id):
-    print(f"Received dashboard request for profile ID: {profile_id}")
     access_token = request.session.get('access')
-    print(f"Session access token: {access_token}")
     if not access_token:
         return JsonResponse({'error': 'Authentication required'}, status=401)
 

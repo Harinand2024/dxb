@@ -1,419 +1,37 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
+{% block body %}
 {% load static %}
 
-{% block container %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    :focus-visible {
-        outline: none !important;
-    }
-    .cover-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    .cover {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-    }
-
-    .edit-icon-top {
-         position: absolute;
-        bottom: 30px;
-        right: 10px;
-        background: white;
-        padding: 10px;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-
-    .edit-icon-top:hover {
-      background: #f0f0f0;
-    }
-    .textarea{
-        width: 100%;
-        margin: 10px 0px;
-        border: 1px solid #ddd;
-        padding: 10px;
-    }
-    .editable:hover {
-        cursor: pointer;
-        background-color: #f0f0f0;
-    }
-    .edit-icon {
-        float: right;
-        cursor: pointer;
-        color: gray;
-        font-size: 16px;
-        margin-top: 8px;
-    }
-    .edit-icon:hover {
-        color: black;
-    }
-    .introFieldsList{
-        padding: 0px;
-    }
-    .profile-detail-actions .btn {
-    font-weight: 500;
-    font-size: 14px;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background-color: #f0f2f5;
-    border: none;
-    transition: background-color 0.3s;
-    }
-
-    .profile-detail-actions .btn:hover {
-    background-color: #e4e6eb;
-    }
-.pd_image {
-  width: 100px !important;
-  height: 100px !important;
-  object-fit: cover;
-  border-radius: 6px !important;
-  display: block;
-}
-
-.profile-img-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.camera-icon {
-      position: absolute;
-    bottom: 3px;
-    right: 21px;
-    background-color: #f0f2f5;
-    border: 2px solid white;
-    border-radius: 50%;
-    padding: 4px 5px;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: 30px;
-    height: 30px;
-}
-
-.camera-icon:hover {
-  background-color: #e4e6eb;
-}
-.post_input_container {
-    background: #fff;
-    border-radius: 5px;
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-/* Style the textarea */
-.post_input_container .textarea {
-    width: 100%;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    resize: vertical;
-    font-size: 14px;
-}
-
-/* Input fields */
-.post_input_container .form-control {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 14px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-}
-
-/* Submit button */
-.post_input_container .btn {
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 8px;
-    padding: 10px 16px;
-}
-
-/* Post action icons section */
-.add_post_link {
-    border-top: 1px solid #eee;
-    padding-top: 12px;
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.add_post_link a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #555;
-    font-size: 14px;
-    transition: background 0.2s;
-    padding: 6px 10px;
-    border-radius: 8px;
-}
-
-.add_post_link a:hover {
-    background-color: #f0f2f5;
-}
-
-.add_post_link img {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-}
-  .friend-request-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 5px 10px;
-  }
-  .friend-request-item img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-  }
-
-
-  </style>
 <div class="profile_container" id="profile_container" data-profile-id="{{ profile.id }}" data-access-token="{{ request.session.access }}">
-    <div class="container m-0 p-0">
-        <div class="cover-wrapper position-relative w-100">
-            <img id="coverImage"
-                src="{% if profile.cover_picture %}http://127.0.0.1:8001{{ profile.cover_picture }}{% else %}{% static 'images/cover.png' %}{% endif %}"
-                alt="cover" class="img-fluid"
-                style="max-height: 300px; object-fit: cover; width: 100%;">
-
-            <div class="position-absolute text-end me-3 mt-2" style="right: 20px; bottom:20px">
-                <!-- Edit Button with Dropdown -->
-                <div class="dropdown">
-                    <button class="btn btn-light d-flex align-items-center gap-1 px-3 py-1 rounded-pill shadow-sm"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-camera"></i> Edit cover photo
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end mt-2 shadow-sm">
-                        <li>
-                            <label class="dropdown-item d-flex align-items-center gap-2" for="coverUpload">
-                                <i class="fas fa-upload"></i> Upload photo
-                            </label>
-                            <input type="file" id="coverUpload" accept="image/*" style="display: none;">
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="#">
-                                <i class="fas fa-trash"></i> Remove
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Crop Cover Image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input type="file" id="uploadInput" class="form-control mb-3" accept="image/*">
-                <div>
-                <img id="profilePicturePreview" style="display: none;">
-
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button id="cropButton" class="btn btn-primary-art">Crop & Save</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="profile_detail">
-        <div class="proflie_detail_left">
-            <div class="profile_row">
-                <div class="profile-img-wrapper position-relative d-inline-block">
-                    <img src="{% if profile.profile_picture %}http://127.0.0.1:8001{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile" class="pd_image">
-                    <label for="profileUpload" class="camera-icon">
-                        <i class="fas fa-camera"></i>
-                    </label>
-                    </div>
-
-                <div>
-                    <!-- Display Name Section -->
-                    <h3>
-                        {{ profile.username }}
-                        <button type="button" class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#editInfoModal">
-                        <i class="fas fa-pencil-alt text-muted"></i>
-                        </button>
-                    </h3>
-                    <p>{{ profile.followers_count}} Friends - {{ profile.followers_count|length }} Followers - Following: {{ profile.following_count|length }}</p>
-                    {% for friend in profile.friends|slice:":4" %}
-                        <img src="{% static friend.image %}" alt="{{ friend.name }}">
-                    {% endfor %}
-                    <p>{{profile.bio}}</p>
-                </div>
-                
-            </div>
-            
-            
-        </div>
-        
-
-            <div class="profile-detail-actions d-flex align-items-center gap-2 flex-wrap">
-            <button type="button" class="btn btn-light d-flex align-items-center rounded-pill" data-bs-toggle="modal" data-bs-target="#editInfoModal">
-                <i class="fas fa-user-edit me-2"></i> Edit Profile
-            </button>
-
-            <div class="dropdown" id="friendsDropdownContainer">
-                <button type="button"
-                        class="btn btn-primary-art d-flex align-items-center rounded-pill dropdown-toggle"
-                        id="friendsDropdownBtn"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="fas fa-user-plus me-2"></i> Friends
-                </button>
-
-                <ul class="dropdown-menu p-2" id="friendRequestsList" style="min-width: 300px;">
-                    <li class="text-muted px-3">Loading...</li>
-                </ul>
-                </div>
-
-
-            <button type="button" class="btn btn-primary-art d-flex align-items-center rounded-pill">
-                <i class="fas fa-envelope me-2"></i> Message
-            </button>
-
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="fas fa-ellipsis-h"></i>
-                </button>
-                <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Block</a></li>
-                <li><a class="dropdown-item" href="#">Report</a></li>
-                <li><a class="dropdown-item" href="#">Unfollow</a></li>
-                </ul>
-            </div>
-
-            </div>
-            
-            <input type="file" id="profileUpload" name="profile_picture" hidden>
-            <input type="file" id="coverUpload" name="cover_picture" hidden>
-              <div class="modal fade" id="coverCropModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title">Crop Cover Picture</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                    <img id="coverCropImage" class="img-fluid" />
-                    </div>
-                    <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary-art" onclick="cropImage('cover')">Crop & Save</button>
-                    </div>
-                </div>
-                </div>
-                
-            </div>
-            
-            <!-- Profile Crop Modal -->
-            <div class="modal fade" id="profileCropModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header"><h5 class="modal-title">Crop Profile Picture</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                    <img id="profileCropImage" class="img-fluid" />
-                    </div>
-                    <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary-art" onclick="cropImage('profile')">Crop & Save</button>
-                    </div>
-                </div>
-                </div>
-            </div>
-
-            <!-- Info Edit Modal -->
-            <div class="modal fade" id="editInfoModal" tabindex="-1" aria-labelledby="editInfoModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                <form id="infoForm" class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title">Edit Profile Info</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" value="{{ profile.username }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="bio" class="form-label">Bio</label>
-                        <textarea name="bio" class="form-control">{{ profile.bio }}</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="visibility_status" class="form-label">Visibility</label>
-                        <select name="visibility_status" class="form-select">
-                        <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
-                        <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
-                        </select>
-                    </div>
-                    </div>
-                    <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary-art">Save</button>
-                    </div>
-                </form>
-                </div>
-            </div>
-            
-    </div>
     
+    
+    <div class="profile_info ">
         
-    <div class="profile_info">
-        
-        <div class="info_col">
-            <div class="col mb-3">
-                <div class="card p-3 shadow-sm">
+        <div class="info_col ">
+            <div class="col mb-3 ">
+                <div class="card p-3 shadow-sm rounded-2">
                 <h5 class="mb-3">Organization</h5>
 
-                <p class="text-muted">Manage your organization members</p>
+                <p class="text-muted mb-3">Manage your organization members</p>
 
                 <button type="button"
-                        class="btn btn-primary-art w-100 d-flex align-items-center justify-content-center rounded-pill"
+                        class="btn btn-art btn-sm w-100 d-flex align-items-center justify-content-center rounded-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#addToOrgModal">
+                        data-bs-target="#addToOrgModal" style="background-color: #030dff; color: #ffffff;">
                     <i class="fas fa-user-plus me-2"></i> Add People to Organization
                 </button>
                 </div>
             </div>
                         <div class="col mb-3">
-                <div class="card p-3 shadow-sm">
+                <div class="card p-3 shadow-sm rounded-2" >
                 <h5 class="mb-3">Roles</h5>
 
-                <p class="text-muted">Manage your Roles </p>
+                <p class="text-muted mb-3">Manage your Roles </p>
 
                 <button type="button"
-                        class="btn btn-primary-art w-100 d-flex align-items-center justify-content-center rounded-pill"
+                        class="btn btn-art btn-sm w-100 d-flex align-items-center justify-content-center rounded-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#addToOrgModal">
+                        data-bs-target="#addToOrgModal" style="background-color: #030dff; color: #ffffff;">
                     <i class="fas fa-user-plus me-2"></i> ADD Roles
                 </button>
                 </div>
@@ -456,14 +74,14 @@
                         <!-- Add Field Input -->
                         <div class="d-flex mt-3">
                             <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
-                            <button class="btn btn-outline-primary-art" onclick="addIntroField(this)">
+                            <button class="btn btn-outline-art" onclick="addIntroField(this)" style="background-color: #f80c9a; color: #ffffff;">
                                 <i class="fas fa-plus-circle"></i>
                             </button>
                         </div>
 
                         <!-- Save Section -->
                         <div class="mt-3">
-                            <button class="btn btn-outline-primary-art btn-md w-100" onclick="saveFields(this.closest('.profile_intro'))">
+                            <button class="btn btn-outline-art btn-sm w-100" style="background-color: #f80c9a; color: #ffffff;" onclick="saveFields(this.closest('.profile_intro'))">
                                  Save
                             </button>
                         </div>
@@ -472,7 +90,7 @@
             </div>
                 <!-- Add More Sections -->
                 <div class="text-center">
-                    <button class="btn btn-primary-art w-100 mb-3" onclick="addNewIntroSection()">
+                    <button class="btn btn-art btn-sm w-100 mb-3" onclick="addNewIntroSection()" style="background-color: #030dff; color: #ffffff;">
                     <i class="fas fa-plus"></i> Add More Sections
                     </button>
                 </div>
@@ -536,7 +154,7 @@
 
             </div> -->
 
-            <div class="post_container">
+            <div class="post_container shadow-sm border-1 rounded-4">
                     <!-- Trigger Card -->
                 
                     <div class="user_profile">
@@ -579,7 +197,7 @@
                     <div id="postModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
                     <div class="bg-white w-full max-w-lg rounded-xl p-4">
                         <div class="flex justify-between items-center border-b pb-3 mb-3">
-                        <h2 class="text-xl font-bold">Create Post</h2>
+                        <h2 class="text-xl font-bold">Drop</h2>
                         <button onclick="closeModal()" class="text-gray-500 hover:text-black text-xl">&times;</button>
                         </div>
 
@@ -609,7 +227,7 @@
 
                 </div>
             {% for post in posts %}
-                <div class="post_container">
+                <div class="post_container shadow-sm border-1 rounded-4">
                     <div class="post_row">
                         <div class="user_profile">
                             <img src="http://127.0.0.1:8001{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
