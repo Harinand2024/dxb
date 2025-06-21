@@ -240,8 +240,20 @@
             <div class="carousel-inner">
               {% for img in canvas_images %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ img }}" class="d-block w-100" style="max-height: 500px; object-fit: cover;"
-                  alt="Canvas {{ forloop.counter }}">
+              <img 
+                src="{% if img %}{{ img }}{% else %}{% static '/images/canva.png' %}{% endif %}" 
+                class="d-block w-100" 
+                style="max-height: 500px; object-fit: cover;" 
+                alt="Canvas {{ forloop.counter }}"
+                onerror="this.onerror=null; this.src='/static/images/default-cover.jpg';">
+            </div>
+              {% empty %}
+              <div class="carousel-item active">
+                <img 
+                  src="{% static 'images/canva.png' %}" 
+                  class="d-block w-100" 
+                  style="max-height: 500px; object-fit: cover;" 
+                  alt="Default Canvas">
               </div>
               {% endfor %}
             </div>
