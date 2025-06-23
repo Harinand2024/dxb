@@ -194,42 +194,46 @@
         </div>
 
         <!-- Settings Dropdown Menu -->
-        <div class="setting_menu bg-white shadow rounded-4 p-3 position-absolute"
-          style="top: 60px; right: 10px; display: none; width: 300px;" id="settingsMenu">
-          <div class="user_profile d-flex align-items-center gap-3 mb-3">
-            <img src="http://127.0.0.1:8001/{{ profile.profile_picture }}" class="rounded-circle shadow-sm"
-              alt="Profile" style="height: 50px; width: 50px;">
-            <div>
-              <p class="fw-bold mb-0">{{ profile.username }}</p>
-              <a href="{% url 'dashboard' %}" class="text-muted small">See Your Profile</a>
+        <div class="setting_menu">
+            
+            <div id="dark_btn" class="dark_btn_on">
+                <span></span>
             </div>
-          </div>
-          <hr />
-          <div class="d-flex align-items-start gap-2 mb-2">
-            <img src="{% static 'images/feedback.png'%}" alt="" width="24">
-            <div>
-              <p class="fw-semibold mb-0">Give Feedback</p>
-              <small class="text-muted">Help us improve the new design</small>
+
+            <div class="settings_menu_inner">
+                <div class="user_profile">
+                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <div>
+                        <p>{{ profile.username }}</p>
+                        <a href="{% url 'dashboard' %}">See Your Profile</a>
+                    </div>
+                </div>
+                <hr />
+                <div class="user_profile">
+                    <img src="{% static 'images/feedback.png'%}" alt="">
+                    <div>
+                        <p>Give Feedback</p>
+                        <a href="#">Help Us To improve  new design</a>
+                    </div>
+                </div>
+                <hr />
+                <div class="setting_link">
+                    <img src="{%static 'images/setting.png'%}" class="setting_icon" alt="">
+                    <a href="#">Setting & Privacy <img src="{%static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{%static 'images/help.png'%}" class="setting_icon" alt="">
+                    <a href="#">Help & Support <img src="{%static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{%static 'images/display.png'%}" class="setting_icon" alt="">
+                    <a href="#">Dispaly & Accesiblity <img src="{%static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
+                <div class="setting_link">
+                    <img src="{%static 'images/logout.png'%}" class="setting_icon" alt="">
+                    <a href="{% url 'logout'%}">Logout<img src="{%static 'images/arrow.png'%}" alt="" width="10px"></a>
+                </div>
             </div>
-          </div>
-          <hr />
-          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
-            <div><img src="{% static 'images/setting.png'%}" width="20"> Setting & Privacy</div>
-            <img src="{% static 'images/arrow.png'%}" width="10">
-          </a>
-          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
-            <div><img src="{% static 'images/help.png'%}" width="20"> Help & Support</div>
-            <img src="{% static 'images/arrow.png'%}" width="10">
-          </a>
-          <a href="#" class="d-flex align-items-center justify-content-between text-decoration-none text-dark mb-2">
-            <div><img src="{% static 'images/display.png'%}" width="20"> Display & Accessibility</div>
-            <img src="{% static 'images/arrow.png'%}" width="10">
-          </a>
-          <a href="{% url 'logout' %}"
-            class="d-flex align-items-center justify-content-between text-decoration-none text-danger">
-            <div><img src="{% static 'images/logout.png'%}" width="20"> Logout</div>
-            <img src="{% static 'images/arrow.png'%}" width="10">
-          </a>
         </div>
       </nav>
 
