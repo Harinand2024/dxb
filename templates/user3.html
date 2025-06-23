@@ -98,8 +98,8 @@
 
             <div class="profile_intro">
                 <div class="title_box d-flex justify-content-between align-items-center mb-2">
-                    <h3 class="mb-0">Photos</h3>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">All Photos</a>
+                    <h3 class="mb-0">Gallery</h3>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">Show Gallery</a>
                 </div>
 
                 <div class="photo_box d-flex flex-wrap gap-2">
@@ -125,19 +125,19 @@
 
             <div class="profile_intro">
                 <div class="title_box d-flex justify-content-between align-items-center">
-                    <h3>Friends</h3>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">All Friends</a>
+                    <h3>Circle</h3>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">Show Circle</a>
                 </div>
 
                 <div class="row row-cols-6 g-2 mt-2">
                     {% for friend in friends|slice:":6" %}
                     <div class="col text-center d-flex flex-column align-items-center">
-                        <img src="{{ friend.image }}" class="rounded-circle mb-3" alt="{{ friend.name }}" width="60"
+                        <img src="{% if friend.image %}{{ friend.image }}{% else %}{% static 'images/profile.png' %}{% endif %}" class="rounded-circle mb-3" alt="{{ friend.name }}" width="60"
                             height="60">
                         <p class="small mb-0">{{ friend.name }}</p>
                     </div>
                     {% empty %}
-                    <p class="text-muted">No friends found.</p>
+                    <p class="text-muted">No Circle found.</p>
                     {% endfor %}
                 </div>
 
@@ -152,7 +152,7 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="photoGalleryModalLabel">Photo Gallery</h5>
+                        <h5 class="modal-title" id="photoGalleryModalLabel"> Gallery</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -202,7 +202,7 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="friendsModalLabel">All Friends</h5>
+                        <h5 class="modal-title" id="friendsModalLabel">All Circle</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -221,7 +221,7 @@
                             {% endfor %}
                         </div>
                         {% else %}
-                        <p class="text-muted text-center">No friends found.</p>
+                        <p class="text-muted text-center">No Circle found.</p>
                         {% endif %}
                     </div>
 
@@ -268,9 +268,9 @@
                 <!-- Trigger Card -->
 
                 <div class="user_profile">
-                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
                     <div>
-                        <p>{{ profile.username }}</p>
+                        <p>{%if profile.username %}{{profile.username}}{%else%} user name{%endif%}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
                     </div>
                 </div>
@@ -308,9 +308,9 @@
                         </div>
 
                         <div class="flex items-center space-x-3 mb-4">
-                            <img src="{{ profile.profile_picture }}" alt="Profile" class="w-10 h-10 rounded-full" />
+                            <img src="{% if profile.profile_picture %}{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile" class="w-10 h-10 rounded-full" />
                             <div>
-                                <p>{{ profile.username }}</p>
+                                <p>{%if profile.username %}{{profile.username}}{%else%} user name{%endif%}</p>
                                 <small>Public <i class="fa fa-caret-down"></i></small>
                             </div>
                         </div>
@@ -339,9 +339,10 @@
             <div class="post_container shadow-sm border-1 rounded-4">
                 <div class="post_row">
                     <div class="user_profile">
-                        <img src="{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
+                        <img src="{% if post.profile_picture %}{{ post.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}" {% static 'images/profile.png' %} alt="Pro We Are Pro You Now">
                         <div>
-                            <p>{{ post.username }}</p>
+                            <p>{%if post.username %}{{post.username}}{%else%} user name{%endif%}</p>
+                            
                             <span>{{ post.created_at}}</span>
                             <span>{{ post.visibility}}</span>
                         </div>
@@ -370,8 +371,8 @@
                 {% for media_item in post.media %}
                 {% with media_item|lower as f %}
                 {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
-                <img src="{{ media_item }}" alt="Feedback" class="post_img">
-                {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+<img src="{{ media_item }}" alt="Feedback"
+         style="width: 100%; height: 400px; object-fit: contain; border-radius: 10px; background-color: black;">                {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
                 <video controls class="post_img fixed-post-img">
                     <source src="{{ media_item }}" type="video/mp4">
                     Your browser does not support the video tag.

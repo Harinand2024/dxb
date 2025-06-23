@@ -280,7 +280,8 @@ function openModal() {
 
         li.innerHTML = `
           <div class="d-flex align-items-center gap-2">
-            <img src="http://127.0.0.1:8001${req.from_profile_pic}" alt="Profile" />
+            <img src="{% if req.from_profile_pic %}http://127.0.0.1:8001{{ req.from_profile_pic }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile">
+
             <span>${req.from_username}</span>
           </div>
           <div class="btn-group btn-group-sm">

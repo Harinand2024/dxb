@@ -13,6 +13,8 @@ def home(request):
         return redirect('login')
 
     access_token = request.session.get('access')
+    session_profile= request.session.get('profile_picture')
+    session_name = request.session.get('username')
     profile_id = request.session.get('profile_id')
 
     if not profile_id:
@@ -33,7 +35,7 @@ def home(request):
             post['profile_picture'] = (
                 f"http://127.0.0.1:8001/media/{post['profile_picture']}"
                 if post.get('profile_picture')
-                else '/static/images/profile_picture.png'
+                else '/static/images/profile.png'
             )
 
     # Fetch profile data
@@ -55,6 +57,8 @@ def home(request):
     return render(request, 'home.html', {
         'posts': posts,
         'profile': profile_data,
+        'session_profile': session_profile,
+        'session_name': session_name,
 
     })
 
@@ -121,7 +125,11 @@ def dashboard_view(request):
         return redirect('login')
 
     access_token = request.session.get('access')
+    session_profile= request.session.get('profile_picture')
+    session_name = request.session.get('username')
     profile_id = request.session.get('profile_id')
+    session_data = dict(request.session)
+    print(session_data)
 
     if not profile_id:
         messages.error(request, "Profile ID not found.")
@@ -252,7 +260,9 @@ def dashboard_view(request):
         'posts': posts,
         'intro_sections': intro_sections,
         'canvas_images': canvas_images,
-        'friends': friends
+        'friends': friends,
+        'session_profile': session_profile,
+        'session_name': session_name,
     })
 
 
@@ -361,6 +371,10 @@ def reset_password_page(request):
 
 def profile_dashboard_view(request, profile_id):
     access_token = request.session.get('access')
+    session_name = request.session.get('username')
+    session_profile= request.session.get('profile_picture')
+    session_data = dict(request.session)
+
     if not access_token:
         return JsonResponse({'error': 'Authentication required'}, status=401)
 
@@ -477,6 +491,8 @@ def profile_dashboard_view(request, profile_id):
         'canvas_images': canvas_images,
         'friends': friends,
         'friend_status': friend_status,
+        'session_username': session_name,
+        'session_profile': session_profile,
     })
 
 

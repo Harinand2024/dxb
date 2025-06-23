@@ -50,7 +50,8 @@
             </ul>
            
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
-                <img src="{{ profile.profile_picture }}" alt="profile">
+                <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="profile">
+
             </div>
         </div>
         <!-- todo: setting menu -->
@@ -59,12 +60,12 @@
             <div id="dark_btn" class="dark_btn_on">
                 <span></span>
             </div>
-
+            
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="{{ profile.profile_picture }}" alt="Pro We Are Pro You Now">
+                    <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
                     <div>
-                        <p>{{ profile.username }}</p>
+                        <p>{{ session_name }}</p>
                         <a href="{% url 'dashboard' %}">See Your Profile</a>
                     </div>
                 </div>

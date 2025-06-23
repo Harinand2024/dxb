@@ -49,9 +49,9 @@
 
         <div class="post_container">
             <div class="user_profile">
-                <img src="{{ profile.profile_picture }}" alt="Profile Picture">
+                <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile Picture">
                 <div>
-                    <p>{{ profile.username }}</p>
+                    <p>{{ session_name }}</p>
                     <small>Public <i class="fa fa-caret-down"></i></small>
                 </div>
             </div>
@@ -85,9 +85,9 @@
                 </div>
 
                 <div class="flex items-center space-x-3 mb-4">
-                    <img src="{{ profile.profile_picture }}" alt="Profile" class="w-10 h-10 rounded-full" />
+                    <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile" class="w-10 h-10 rounded-full" />
                     <div>
-                        <p>{{ profile.username }}</p>
+                        <p>{{ session_name }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
                     </div>
                 </div>
@@ -113,7 +113,8 @@
         <div class="post_container">
             <div class="post_row">
                 <div class="user_profile">
-                    <img src="{{ post.profile_picture }}" alt="User">
+                    <img src="{{post.profile_picture}}" alt="hello">
+                     <!-- <img src="{% static 'images/profile.png' %}" alt=""> -->
                     <div>
                         {% if post.profile == request.session.profile_id %}
                         {% url 'dashboard' as profile_url %}

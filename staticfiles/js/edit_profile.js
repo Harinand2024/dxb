@@ -1,5 +1,7 @@
 let cropper = null;
 let currentCropType = null;
+// let accessToken = profile_container.dataset.accessToken;
+let accessToken = null; // Global access token placeholder
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
@@ -11,11 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const coverImage = document.getElementById('coverImage');
     const profileImage = document.querySelector('.pd_image');
 
-    // Debug: Check if elements exist
-    console.log('Profile input:', profileInput);
-    console.log('Cover input:', coverInput);
-    console.log('Profile crop image:', profileCropImage);
-    console.log('Cover crop image:', coverCropImage);
 
     // Open cropper in modal
     function openCropper(type, file) {
@@ -158,77 +155,61 @@ document.addEventListener('DOMContentLoaded', function () {
     // Upload image function
     function uploadImage(type, file) {
         const formData = new FormData();
-        
-        // Add the image file with the correct field name
+
+        // Append file to form data
         if (type === 'profile') {
             formData.append('profile_picture', file);
         } else if (type === 'cover') {
             formData.append('cover_picture', file);
         }
 
-        // Get CSRF token - Try multiple methods
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                        document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ||
-                        getCookie('csrftoken');
-        
-        if (csrfToken) {
-            formData.append('csrfmiddlewaretoken', csrfToken);
-        }
-
         // Get profile ID
-        const profileId = document.querySelector('.profile_container')?.dataset.profileId || 
+        const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
                         document.querySelector('[name="profile_id"]')?.value ||
                         getProfileIdFromUrl();
-        
+
         if (!profileId) {
             console.error('Profile ID not found');
             showNotification('Profile ID not found. Please refresh the page.', 'error');
             return;
         }
 
-        // Fix: Use relative URL and remove hardcoded localhost
-        const uploadUrl = `http://127.0.0.1:8001/profile/profile/${profileId}/`;
-        
-        console.log(`Uploading ${type} image to:`, uploadUrl);
-        console.log('CSRF Token:', csrfToken);
+        // Get access token
+        const accessToken = document.querySelector('.profile_container')?.dataset.accessToken;
 
-        // Show loading indicator
-        showNotification(`Uploading ${type} image...`, 'info');
-
-        // Prepare headers - Don't set Content-Type for FormData
-        const headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-        };
-
-        // Add CSRF token to headers as well
-        if (csrfToken) {
-            headers['X-CSRFToken'] = csrfToken;
+        if (!accessToken) {
+            console.error('Access token not found');
+            showNotification('Access token missing. Please log in again.', 'error');
+            return;
         }
 
-        // Try session-based authentication first
+        const uploadUrl = `http://127.0.0.1:8001/profile/profile/${profileId}/`;
+
+        const headers = {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        showNotification(`Uploading ${type} image...`, 'info');
+
         fetch(uploadUrl, {
             method: 'PUT',
             body: formData,
-            headers: headers,
-            credentials: 'include' // Include cookies for session-based auth
+            headers: headers
         })
         .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            
             if (!response.ok) {
                 return response.text().then(text => {
                     console.error('Response body:', text);
-                    throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
                 });
             }
             return response.json();
         })
         .then(data => {
-            console.log(`${type} image uploaded successfully:`, data);
             showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} image updated successfully!`, 'success');
-            
-            // Update the image source with the new URL if provided
+
+            // Update the image preview
             if (data.image_url) {
                 if (type === 'profile' && profileImage) {
                     profileImage.src = data.image_url;
@@ -236,32 +217,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     coverImage.src = data.image_url;
                 }
             }
-            
-            // Refresh the page after successful upload to show updated image
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+
+            // Optional reload
+            setTimeout(() => window.location.reload(), 1500);
         })
         .catch(error => {
             console.error(`Error uploading ${type} image:`, error);
-            
-            // More specific error handling
             if (error.message.includes('401')) {
                 showNotification('Authentication failed. Please log in again.', 'error');
-                // Redirect to login page after a delay
-                setTimeout(() => {
-                    window.location.href = '/login/';
-                }, 2000);
+                setTimeout(() => location.href = '/login/', 2000);
             } else if (error.message.includes('403')) {
                 showNotification('You do not have permission to update this profile.', 'error');
             } else if (error.message.includes('405')) {
-                // If PUT method not allowed, try PATCH
                 retryWithPatch(type, file, uploadUrl, headers);
             } else {
                 showNotification(`Failed to update ${type} image. Please try again.`, 'error');
             }
         });
     }
+
 
     // Retry upload with PATCH method if PUT fails
     function retryWithPatch(type, file, uploadUrl, headers) {
@@ -409,30 +383,114 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle info form submit
     const infoForm = document.getElementById('infoForm');
+
+    // if (infoForm) {
+    //     infoForm.addEventListener('submit', function (e) {
+    //         e.preventDefault();
+    //         const formData = new FormData(infoForm);
+
+    //         const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
+    //                         getProfileIdFromUrl();
+
+    //         if (!profileId) {
+    //             showNotification('Profile ID not found. Please refresh the page.', 'error');
+    //             return;
+    //         }
+
+    //         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+    //                         getCookie('csrftoken');
+
+    //         if (csrfToken) {
+    //             formData.append('csrfmiddlewaretoken', csrfToken);
+    //         }
+
+    //         const headers = {
+    //             'X-Requested-With': 'XMLHttpRequest',
+    //             'Authorization': `Bearer ${accessToken}`
+    //         };
+
+    //         if (csrfToken) {
+    //             headers['X-CSRFToken'] = csrfToken;
+    //         }
+
+    //         fetch(`http://127.0.0.1:8001/profile/profile/${profileId}/`, {
+    //             method: 'PUT',
+    //             body: formData,
+    //             headers: {'Authorization': `Bearer ${accessToken}`,
+    //             credentials: 'include'}
+    //         })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 return response.text().then(text => {
+    //                     throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+    //                 });
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             showNotification('Profile info updated successfully!', 'success');
+
+    //             const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
+    //             if (modal) modal.hide();
+
+    //             if (data.username) {
+    //                 const usernameElements = document.querySelectorAll('h3:first-child, p:first-child');
+    //                 usernameElements.forEach(el => {
+    //                     if (el.textContent.includes(data.username)) {
+    //                         el.textContent = data.username;
+    //                     }
+    //                 });
+    //             }
+
+    //             setTimeout(() => location.reload(), 2000);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error updating profile:', error);
+
+    //             if (error.message.includes('401')) {
+    //                 showNotification('Authentication failed. Please log in again.', 'error');
+    //             } else if (error.message.includes('403')) {
+    //                 showNotification('You do not have permission to update this profile.', 'error');
+    //             } else {
+    //                 showNotification('Failed to update profile info. Please try again.', 'error');
+    //             }
+    //         });
+    //     });
+    // }
+
+    if (infoForm) {
+    const infoForm = document.getElementById('infoForm');
+    const profileContainer = document.querySelector('.profile_container');
+
+    if (profileContainer) {
+        accessToken = profileContainer.dataset.accessToken || '';
+    }
+
     if (infoForm) {
         infoForm.addEventListener('submit', function (e) {
             e.preventDefault();
+
             const formData = new FormData(infoForm);
 
-            // Get profile ID from the form or URL
-            const profileId = document.querySelector('.profile_container')?.dataset.profileId ||
-                            getProfileIdFromUrl();
+            const profileId = profileContainer?.dataset.profileId || getProfileIdFromUrl();
 
             if (!profileId) {
                 showNotification('Profile ID not found. Please refresh the page.', 'error');
                 return;
             }
 
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                            getCookie('csrftoken');
-            
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
             if (csrfToken) {
                 formData.append('csrfmiddlewaretoken', csrfToken);
             }
 
-            let headers = {
-                'X-Requested-With': 'XMLHttpRequest',
+            const headers = {
+                'X-Requested-With': 'XMLHttpRequest'
             };
+
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
 
             if (csrfToken) {
                 headers['X-CSRFToken'] = csrfToken;
@@ -442,48 +500,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'PUT',
                 body: formData,
                 headers: headers,
-                credentials: 'include'
+                credentials: 'include' // Must be outside headers
             })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                showNotification('Profile info updated successfully!', 'success');
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
-                if (modal) modal.hide();
-                
-                // Update the display with new data
-                if (data.username) {
-                    const usernameElements = document.querySelectorAll('h3:first-child, p:first-child');
-                    usernameElements.forEach(el => {
-                        if (el.textContent.includes(data.username)) {
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showNotification('Profile info updated successfully!', 'success');
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editInfoModal'));
+                    if (modal) modal.hide();
+
+                    // Update username on UI immediately
+                    if (data.username) {
+                        document.querySelectorAll('[data-username-display]').forEach(el => {
                             el.textContent = data.username;
-                        }
-                    });
-                }
-                
-                // Optionally reload page after a delay
-                setTimeout(() => location.reload(), 2000);
-            })
-            .catch(error => {
-                console.error('Error updating profile:', error);
-                
-                if (error.message.includes('401')) {
-                    showNotification('Authentication failed. Please log in again.', 'error');
-                } else if (error.message.includes('403')) {
-                    showNotification('You do not have permission to update this profile.', 'error');
-                } else {
-                    showNotification('Failed to update profile info. Please try again.', 'error');
-                }
-            });
+                        });
+                    }
+
+                    setTimeout(() => location.reload(), 2000);
+                })
+                .catch(error => {
+                    console.error('Error updating profile:', error);
+
+                    if (error.message.includes('401')) {
+                        showNotification('Authentication failed. Please log in again.', 'error');
+                    } else if (error.message.includes('403')) {
+                        showNotification('You do not have permission to update this profile.', 'error');
+                    } else {
+                        showNotification('Failed to update profile info. Please try again.', 'error');
+                    }
+                });
         });
     }
+}
+
+
 
     // Utility function to show notifications
     function showNotification(message, type = 'info') {
@@ -510,56 +567,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     }
 
-    // Intro field management functions
-    window.addIntroField = function(button) {
-        const input = button.previousElementSibling;
-        const text = input.value.trim();
-        
-        if (!text) {
-            alert('Please enter some text first');
-            return;
-        }
-
-        const list = button.closest('.profile_intro').querySelector('.introFieldsList');
-        const newItem = document.createElement('li');
-        newItem.className = 'd-flex align-items-center mb-2';
-        newItem.innerHTML = `
-            <img src="images/profile-job.png" alt="Custom" class="me-2" />
-            <span contenteditable="true" class="flex-grow-1">${text}</span>
-            <button class="btn btn-sm ms-2" onclick="removeIntroField(this)" title="Delete">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        `;
-        
-        list.appendChild(newItem);
-        input.value = '';
-    };
-
-    window.removeIntroField = function(button) {
-        if (confirm('Are you sure you want to remove this field?')) {
-            button.closest('li').remove();
-        }
-    };
-
     window.addNewIntroSection = function() {
         const container = document.getElementById('introContainer');
         const newSection = document.createElement('div');
         newSection.className = 'profile_intro border rounded p-3 mb-3';
+
+        // Generate a temporary display order
+        const displayOrder = Date.now() % 10000;
+        newSection.dataset.displayOrder = displayOrder;
+
         newSection.innerHTML = `
             <h3 contenteditable="true" class="mb-3">
-                <i class="fas fa-user-edit edit-icon me-2"></i>New Section
+            <i class="fas fa-user-edit edit-icon me-2"></i>New Section
             </h3>
             <ul class="introFieldsList list-unstyled"></ul>
             <div class="d-flex mt-3">
-                <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
-                <button class="btn btn-outline-primary-art" onclick="addIntroField(this)" title="Add Field">
-                    <i class="fas fa-plus-circle"></i>
-                </button>
+            <input type="text" class="form-control me-2 newFieldInput" placeholder="Add custom intro line..." />
+            <button class="btn btn-outline-primary-art" onclick="addIntroField(this)" title="Add Field">
+                <i class="fas fa-plus-circle"></i>
+            </button>
+            </div>
+            <div class="mt-3 text-end">
+            <button class="btn btn-outline-primary-art btn-md w-100" onclick="saveFields(this.closest('.profile_intro'))">
+                Save
+            </button>
             </div>
         `;
-        
+
         container.appendChild(newSection);
-    };
+        };
+
 
     // Name editing functions
     window.enableEdit = function() {
@@ -592,16 +629,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Profile script initialized successfully');
 });
-
 const introContainer = document.getElementById('introContainer');
 const profileId = introContainer.dataset.profileId;
-const accessToken = introContainer.dataset.accessToken;
-const imageSrc = introContainer.dataset.imgSrc;
+const bccessToken = introContainer.dataset.accessToken;
+
+// Updated JavaScript for Profile Intro Management
+
 
 function updateIntroSectionTitle(el) {
   const sectionDiv = el.closest('.profile_intro');
   const sectionId = sectionDiv.dataset.sectionId;
-  const displayOrder = sectionDiv.dataset.displayOrder;
+  const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
   const newTitle = el.textContent.trim();
 
   fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
@@ -612,12 +650,10 @@ function updateIntroSectionTitle(el) {
     },
     body: JSON.stringify({
       title: newTitle,
-      display_order: parseInt(displayOrder, 10),
+      display_order: displayOrder,
       description: ""
     })
-  })
-  .then(r => r.json())
-  .then(d => {
+  }).then(r => r.json()).then(d => {
     if (!d.status) alert('Failed to update section title');
   });
 }
@@ -625,30 +661,184 @@ function updateIntroSectionTitle(el) {
 function addIntroField(btn) {
   const input = btn.previousElementSibling;
   const text = input.value.trim();
-  if (!text) return alert('Please type a field first');
+  if (!text) return alert('Please enter a field value');
 
-  const li = document.createElement('li');
-  li.className = 'd-flex align-items-center mb-2';
-  li.setAttribute('data-field-id', '');
-  li.innerHTML = `
-    <img src="${imageSrc}" alt="Custom" class="me-2" />
-    <span contenteditable="true">${text}</span>
-    <button class="btn btn-sm ms-2" onclick="removeIntroField(this)">
-      <i class="fas fa-trash-alt"></i>
-    </button>`;
-  btn.closest('.profile_intro').querySelector('.introFieldsList').appendChild(li);
-  input.value = '';
+  const sectionDiv = btn.closest('.profile_intro');
+  const sectionId = sectionDiv.dataset.sectionId;
+  const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
+  const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
+  const fieldList = sectionDiv.querySelectorAll('li');
+
+  // Check for duplicate field
+  const duplicate = Array.from(fieldList).some(li => 
+    li.querySelector('span').textContent.trim().toLowerCase() === text.toLowerCase()
+  );
+  if (duplicate) return alert('This field already exists in the section');
+
+  const payload = {
+    section: {
+      title: sectionTitle,
+      display_order: displayOrder,
+      description: ""
+    },
+    fields: [
+      {
+        field_type: 'text',
+        field_name: text,
+        text_value: text,
+        display_order: fieldList.length + 1
+      }
+    ]
+  };
+
+  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.status) {
+      console.error(data);
+      alert('Error adding field');
+    } else {
+      location.reload();
+    }
+  });
 }
 
 function removeIntroField(btn) {
-  if (confirm('Delete this field?')) {
-    const li = btn.closest('li');
+  if (!confirm('Delete this field?')) return;
+
+  const li = btn.closest('li');
+  const fieldId = li.dataset.fieldId;
+  const introContainer = document.getElementById('introContainer');
+  const profileId = introContainer.dataset.profileId;
+  const accessToken = introContainer.dataset.accessToken;
+
+  if (!fieldId) {
+    // New unsaved field — just remove from UI
     li.remove();
+    return;
   }
+
+  // Send DELETE request
+  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ ids: [parseInt(fieldId)] })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) {
+      li.remove(); // Only remove from DOM if successfully deleted
+    } else {
+      alert('Delete failed: ' + (data.message?.non_field_errors?.[0] || 'Unknown error'));
+      console.error(data);
+    }
+  })
+  .catch(err => {
+    console.error('Delete error:', err);
+    alert('Server error during delete');
+  });
+}
+function removeSectionField(btn) {
+  if (!confirm('Delete this section?')) return;
+
+  const sectionDiv = btn.closest('.profile_intro');
+  const sectionId = sectionDiv.dataset.sectionId;
+
+  const introContainer = document.getElementById('introContainer');
+  const accessToken = introContainer.dataset.accessToken;
+
+  if (!sectionId) {
+    // Section not yet saved — remove from UI only
+    sectionDiv.remove();
+    return;
+  }
+
+  // DELETE section by ID (no body required)
+  fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status) {
+      sectionDiv.remove();
+    } else {
+      alert('Failed to delete section: ' + (data.message?.non_field_errors?.[0] || 'Unknown error'));
+    }
+  })
+  .catch(err => {
+    console.error('Delete section error:', err);
+    alert('Server error deleting section');
+  });
+}
+
+
+function saveFields(sectionDiv) {
+  const sectionId = sectionDiv.dataset.sectionId;
+  let displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10);
+  if (isNaN(displayOrder)) {
+    displayOrder = Date.now() % 10000;
+  }
+
+  const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
+  const fieldList = Array.from(sectionDiv.querySelectorAll('li'));
+
+  const fields = fieldList.map((li, i) => {
+    const fieldName = li.querySelector('span').textContent.trim();
+    const fieldId = li.dataset.fieldId;
+    const field = {
+      field_type: 'text',
+      field_name: fieldName,
+      text_value: fieldName,
+      display_order: i + 1
+    };
+    if (fieldId) field.id = fieldId;
+    return field;
+  });
+
+  const payload = {
+    section: {
+      title: sectionTitle,
+      display_order: displayOrder,
+      description: ""
+    },
+    // fields
+  };
+
+  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.status) {
+      console.error('Save fields error', data);
+      alert('Error saving fields');
+    } else {
+      alert('Section saved successfully');
+      location.reload();
+    }
+  });
 }
 
 function addNewIntroSection() {
-  const title = prompt('New section title');
+  const title = prompt('Enter new section title');
   if (!title) return;
 
   const payload = {
@@ -675,43 +865,42 @@ function addNewIntroSection() {
   });
 }
 
-function saveFields(sectionDiv) {
-  const sectionId = sectionDiv.dataset.sectionId;
-  const displayOrder = sectionDiv.dataset.displayOrder;
-  const sectionTitle = sectionDiv.querySelector('h3').textContent.trim();
+function handleDeleteClick(el, event) {
+  event.preventDefault();
 
-  const fields = Array.from(sectionDiv.querySelectorAll('li')).map((li, i) => ({
-    id: li.dataset.fieldId || null,
-    field_type: 'text',
-    field_name: li.querySelector('span').textContent.trim(),
-    text_value: li.querySelector('span').textContent.trim(),
-    display_order: i + 1
-  }));
+  const postId = el.dataset.postId;
+  // const introContainer = document.getElementById('introContainer');
+const accessToken = document.getElementById('introContainer')?.dataset.accessToken;
+    console.log("Token used:", accessToken);
 
-  const payload = {
-    section: {
-      title: sectionTitle,
-      display_order: parseInt(displayOrder, 10),
-      description: ""
-    },
-    fields
-  };
+  if (!postId || !accessToken) {
+    console.error("Missing postId or accessToken", { postId, accessToken });
+    alert("Unable to delete: Missing data.");
+    return;
+  }
 
-  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
-    method: 'POST',
+  if (!confirm('Are you sure you want to delete this post?')) return;
+
+  fetch(`http://127.0.0.1:8001/media/post/${postId}/`, {
+    method: 'DELETE',
     headers: {
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${accessToken}`
-    },
-    body: JSON.stringify(payload)
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (!data.status) {
-      console.error('Save fields error', data);
-      alert('Error saving fields');
-    } else {
-      alert('Section saved successfully');
     }
+  })
+  .then(response => {
+    if (response.status === 204) {
+      const postElement = el.closest('.post_container');
+      if (postElement) postElement.remove();
+    } else {
+      return response.json().then(data => {
+        alert(data.message || 'Failed to delete post.');
+      });
+    }
+  })
+  .catch(error => {
+    console.error('Error deleting post:', error);
+    alert('Error deleting post');
   });
 }
+console.log("postId:", postId);
+console.log("accessToken:", accessToken);

@@ -208,9 +208,7 @@
                 <div class="profile-img-wrapper position-relative d-inline-block">
                     <img src="{% if profile.profile_picture %}{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}"
                         alt="Profile" class="pd_image">
-                    <label for="profileUpload" class="camera-icon">
-                        <i class="fas fa-camera"></i>
-                    </label>
+
                 </div>
 
                 <div>
@@ -231,7 +229,7 @@
         </div>
 
 
-        <div class="profile-detail-actions d-flex align-items-center gap-2 flex-wrap">
+        <div class="profile-detail-actions d-flex align-items-center gap-2 flex-wrap mt-4">
 
             <button id="addFriendBtn" class="btn d-flex align-items-center rounded-pill 
         {% if friend_status == 'pending' %}btn-warning
@@ -262,7 +260,7 @@
 
             <div id="introContainer" data-profile-id="{{ profile.id }}"
                 data-access-token="{{ request.session.access }}">
-
+                
                 {% for intro_section in intro_sections %}
                 <div class="profile_intro border rounded p-3 mb-3" id="intro_section"
                     data-section-id="{{ intro_section.id }}" data-display-order="{{ intro_section.display_order }}">
@@ -283,25 +281,33 @@
 
             <div class="profile_intro">
                 <div class="title_box">
-                    <h3>Photos</h3>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">All Photos</a>
+                    <h3>Gallery</h3>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#photoGalleryModal">Show Gallery</a>
                 </div>
-                <div class="photo_box">
-                    {% for photo in photos|slice:":6" %}
+                <div class="photo_box d-flex flex-wrap gap-2">
+                    {% for media in photos|slice:":6" %}
+                    {% with media|lower as f %}
                     <div>
-                        <img src="{{ photo }}" alt="Photo" class="img-fluid"
-                            style="object-fit: cover;width: 100px;height: 100px;">
+                        {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+                        <img src="{{ media }}" alt="Photo" class="img-fluid rounded"
+                            style="object-fit: cover; width: 100px; height: 100px;">
+                        {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                        <video class="rounded" controls muted style="object-fit: cover; width: 100px; height: 100px;">
+                            <source src="{{ media }}" type="video/mp4">
+                        </video>
+                        {% endif %}
                     </div>
+                    {% endwith %}
                     {% empty %}
-                    <p>No photos uploaded yet.</p>
+                    <p>No Gallery uploaded yet.</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div class="profile_intro">
                 <div class="title_box d-flex justify-content-between align-items-center">
-                    <h3>Friends</h3>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">All Friends</a>
+                    <h3>Circle</h3>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">Show Circle</a>
                 </div>
 
                 <div class="row row-cols-6 g-2 mt-2">
@@ -312,7 +318,7 @@
                         <p class="small mb-0">{{ friend.name }}</p>
                     </div>
                     {% empty %}
-                    <p class="text-muted">No friends found.</p>
+                    <p class="text-muted">No Circle found.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -332,18 +338,37 @@
 
                     <div class="modal-body">
 
-                        <!-- Large Preview -->
-                        <div class="text-center mb-4">
+                        <div class="text-center mb-4" id="mainPreviewContainer">
+                            {% with photos.0|lower as f %}
+                            {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
                             <img id="mainPreviewImage" src="{{ photos.0 }}" class="img-fluid rounded shadow"
                                 style="max-height: 400px; object-fit: contain;">
+                            {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                            <video id="mainPreviewVideo" class="img-fluid rounded shadow" controls
+                                style="max-height: 400px; object-fit: contain;">
+                                <source src="{{ photos.0 }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            {% endif %}
+                            {% endwith %}
                         </div>
 
                         <!-- Thumbnail Gallery -->
                         <div class="d-flex flex-wrap justify-content-center gap-2">
                             {% for photo in photos %}
+                            {% with photo|lower as f %}
+                            {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
                             <img src="{{ photo }}" class="img-thumbnail border border-secondary"
                                 style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
                                 onclick="updatePreview(this)">
+                            {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                            <video class="img-thumbnail border border-secondary"
+                                style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
+                                onclick="updatePreview(this)">
+                                <source src="{{ photo }}" type="video/mp4">
+                            </video>
+                            {% endif %}
+                            {% endwith %}
                             {% endfor %}
                         </div>
 
@@ -357,12 +382,13 @@
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="friendsModalLabel">All Friends</h5>
+                        <h5 class="modal-title" id="friendsModalLabel">All Circle</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
                         {% if friends %}
+                        
                         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
                             {% for friend in friends %}
                             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
@@ -380,19 +406,19 @@
                             {% endfor %}
                         </div>
                         {% else %}
-                        <p class="text-muted text-center">No friends found.</p>
+                        <p class="text-muted text-center">No Circle found.</p>
                         {% endif %}
                     </div>
 
                 </div>
             </div>
         </div>
-        <div class="post_col">
+        <div class="post_col mt-2">
             {% for post in posts %}
             <div class="post_container">
                 <div class="post_row">
                     <div class="user_profile">
-                        <img src="{{ post.profile_picture }}" alt="Pro We Are Pro You Now">
+                        <img src="{% if profile.profile_picture %}{{ profile.profile_picture }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
                         <div>
                             <p>{{ post.username }}</p>
                             <span>{{ post.created_at}}</span>
@@ -410,16 +436,21 @@
                 {% if post.media %}
                 {% for media_item in post.media %}
                 {% with media_item|lower as f %}
-                {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
-                <img src="{{ media_item }}" alt="Feedback" class="post_img">
-                {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
-                <video controls class="post_img fixed-post-img">
-                    <source src="{{ media_item }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-                {% endif %}
+                <div
+                    style="width: 100%; max-width: 500px; height: 500px; overflow: hidden; margin: 0 auto; border-radius: 8px;">
+                    {% if ".jpg" in f or ".jpeg" in f or ".png" in f or ".webp" in f %}
+                    <img src="{{ media_item }}" alt="Post Image"
+                        style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    {% elif ".mp4" in f or ".mov" in f or ".webm" in f %}
+                    <video controls style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                        <source src="{{ media_item }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    {% endif %}
+                </div>
                 {% endwith %}
                 {% endfor %}
+
                 {% endif %}
 
             </div>
