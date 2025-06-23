@@ -232,7 +232,7 @@ def dashboard_view(request):
                 friends.append({
                     'id': friend.get('id'),
                     'name': friend.get('username'),
-                    'image': f"http://127.0.0.1:8001{friend.get('profile_pic')}" if friend.get('profile_pic') else '/static/images/profile-pic.png'
+                    'image': f"http://127.0.0.1:8001{friend.get('profile_picture')}" if friend.get('profile_picture') else '/static/images/profile-pic.png'
                 })
         else:
             print("Friend list fetch failed:", friends_response.status_code)

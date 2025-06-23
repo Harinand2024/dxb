@@ -10,9 +10,9 @@
 
       <!-- Profile Image -->
       {% if profile.profile_picture %}
-        <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="pd_image">
+      <img src="http://127.0.0.1:8001{{ profile.profile_picture }}" alt="Profile" class="pd_image">
       {% else %}
-        <img src="{% static 'images/profile.png' %}" alt="Profile" class="pd_image">
+      <img src="{% static 'images/profile.png' %}" alt="Profile" class="pd_image">
       {% endif %}
 
       <div>
@@ -20,13 +20,13 @@
           {{ profile.username }}
           <i class="fas fa-pencil-alt text-muted" onclick="toggleEditForm()" style="cursor:pointer;"></i>
         </h3>
-        <p>{{ profile.friends|length }} Friends</p>
-        <p>Following: {{ profile.following_count|length }}</p>
-        <p>Followers: {{ profile.followers_count|length }}</p>
+        <p class="text-muted small">
+          {{ profile.friends_count }} Friends – {{ profile.followers_count }} Followers – Following: {{profile.following_count }}
+        </p>
 
         <!-- Display first 4 friends -->
         {% for friend in profile.friends|slice:":4" %}
-          <img src="{% static friend.image %}" alt="{{ friend.name }}" style="height:30px;width:30px;border-radius:50%;">
+        <img src="{% static friend.image %}" alt="{{ friend.name }}" style="height:30px;width:30px;border-radius:50%;">
         {% endfor %}
       </div>
 
@@ -46,16 +46,18 @@
 
           <label>Profile Picture:</label><br>
           <input type="file" name="profile_picture" id="profilePictureInput"><br>
-          <img id="profilePicturePreview" src="http://127.0.0.1:8001{{ profile.profile_picture }}" style="height: 50px;width: 50px;"><br>
+          <img id="profilePicturePreview" src="http://127.0.0.1:8001{{ profile.profile_picture }}"
+            style="height: 50px;width: 50px;"><br>
 
           <label>Cover Picture:</label><br>
           <input type="file" name="cover_picture" id="coverPictureInput"><br>
-          <img id="coverPicturePreview" src="http://127.0.0.1:8001{{ profile.cover_picture }}" style="height: 50px;width: 50px;"><br>
+          <img id="coverPicturePreview" src="http://127.0.0.1:8001{{ profile.cover_picture }}"
+            style="height: 50px;width: 50px;"><br>
 
           <label>Visibility:</label><br>
           <select name="visibility_status">
-            <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
-            <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
+            <option value="public" {% if profile.visibility_status=='public' %}selected{% endif %}>Public</option>
+            <option value="private" {% if profile.visibility_status=='private' %}selected{% endif %}>Private</option>
           </select><br>
 
           <button type="submit" class="submit-btn">Update</button>

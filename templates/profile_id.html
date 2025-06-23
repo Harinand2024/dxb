@@ -219,8 +219,8 @@
                         {{ profile.username }}
                     </h3>
                     <p class="text-muted small">
-                        {{ profile.friends_count }} Friends – {{ profile.followers_count }} Followers – Following: {{
-                        profile.following_count }}
+                        {{ profile.friends_count }} Friends – {{ profile.followers_count }} Followers – Following
+                        {{profile.following_count }}
                     </p>
                     <p>{{profile.bio}}</p>
                 </div>
@@ -233,19 +233,17 @@
 
         <div class="profile-detail-actions d-flex align-items-center gap-2 flex-wrap">
 
-<button id="addFriendBtn"
-    class="btn d-flex align-items-center rounded-pill 
+            <button id="addFriendBtn" class="btn d-flex align-items-center rounded-pill 
         {% if friend_status == 'pending' %}btn-warning
         {% elif friend_status == 'accepted' %}btn-success d-none
         {% elif friend_status == 'rejected' or friend_status == 'cancelled' %}btn-secondary
-        {% else %}btn-primary-art{% endif %}"
-    data-profile-id="{{ profile.id }}">
-    <i class="fas fa-user-plus me-2"></i>
-    {% if friend_status == 'pending' %}Request Sent
-    {% elif friend_status == 'accepted' %}Friend
-    {% elif friend_status == 'rejected' or friend_status == 'cancelled' %}Request Cancelled
-    {% else %}Add Friend{% endif %}
-</button>
+        {% else %}btn-primary-art{% endif %}" data-profile-id="{{ profile.id }}">
+                <i class="fas fa-user-plus me-2"></i>
+                {% if friend_status == 'pending' %}Request Sent
+                {% elif friend_status == 'accepted' %}Friend
+                {% elif friend_status == 'rejected' or friend_status == 'cancelled' %}Request Cancelled
+                {% else %}Add Friend{% endif %}
+            </button>
 
 
 
@@ -306,12 +304,12 @@
                     <a href="#" data-bs-toggle="modal" data-bs-target="#friendsModal">All Friends</a>
                 </div>
 
-                <div class="row row-cols-3 g-2 mt-2">
+                <div class="row row-cols-6 g-2 mt-2">
                     {% for friend in friends|slice:":6" %}
-                    <div class="col text-center">
-                        <img src="{{ friend.image }}" class="rounded-circle" alt="{{ friend.name }}" width="60"
+                    <div class="col text-center d-flex flex-column align-items-center">
+                        <img src="{{ friend.image }}" class="rounded-circle mb-3" alt="{{ friend.name }}" width="60"
                             height="60">
-                        <p class="small mt-1">{{ friend.name }}</p>
+                        <p class="small mb-0">{{ friend.name }}</p>
                     </div>
                     {% empty %}
                     <p class="text-muted">No friends found.</p>
@@ -367,19 +365,17 @@
                         {% if friends %}
                         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
                             {% for friend in friends %}
-                            <div class="col text-center">
-                                <img src="{{ friend.image }}" class="rounded-circle shadow-sm" alt="{{ friend.name }}"
-                                    width="80" height="80">
-                                {% if friend.id == request.session.profile_id %}
-                                <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
-                                    {% else %}
+                            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                                {% for friend in friends %}
+                                <div class="col text-center d-flex flex-column align-items-center">
+                                    <img src="{{ friend.image }}" class="rounded-circle shadow-sm"
+                                        alt="{{ friend.name }}" width="80" height="80">
                                     <a href="{% url 'profile-dashboard-api' friend.id %}"
                                         class="text-decoration-none text-dark">
                                         <p class="mt-2 fw-medium">{{ friend.name }}</p>
-
-                                        {% endif %}
-                                        <p class="mb-0">{{ friend.name }}</p>
                                     </a>
+                                </div>
+                                {% endfor %}
                             </div>
                             {% endfor %}
                         </div>
@@ -457,7 +453,7 @@
         }
 
         try {
-            const response = await fetch('/profile/send-friend-request/', {
+            const response = await fetch('http://127.0.0.1:8001/profile/send-friend-request/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -496,14 +492,14 @@
 </script>
 <script>
     document.getElementById('addFriendBtn')?.addEventListener('click', function () {
-  const profileId = this.dataset.profileId;
-  const btnText = this.querySelector('.btn-text')?.innerText;
+        const profileId = this.dataset.profileId;
+        const btnText = this.querySelector('.btn-text')?.innerText;
 
-  // Only send if not already sent or accepted
-  if (btnText !== 'Add Friend') return;
+        // Only send if not already sent or accepted
+        if (btnText !== 'Add Friend') return;
 
-  sendFriendRequest(profileId);
-});
+        sendFriendRequest(profileId);
+    });
 
 </script>
 

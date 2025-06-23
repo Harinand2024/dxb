@@ -85,8 +85,7 @@
                 </div>
 
                 <div class="flex items-center space-x-3 mb-4">
-                    <img src="{{ profile.profile_picture }}" alt="Profile"
-                        class="w-10 h-10 rounded-full" />
+                    <img src="{{ profile.profile_picture }}" alt="Profile" class="w-10 h-10 rounded-full" />
                     <div>
                         <p>{{ profile.username }}</p>
                         <small>Public <i class="fa fa-caret-down"></i></small>
@@ -117,14 +116,18 @@
                     <img src="{{ post.profile_picture }}" alt="User">
                     <div>
                         {% if post.profile == request.session.profile_id %}
-                            <a href="{% url 'dashboard' %}" class="text-decoration-none text-dark">
+                        {% url 'dashboard' as profile_url %}
                         {% else %}
-                            <a href="{% url 'profile-dashboard-api' post.profile %}" class="text-decoration-none text-dark">
+                        {% url 'profile-dashboard-api' post.profile as profile_url %}
                         {% endif %}
+
+                        <a href="{{ profile_url }}" class="text-decoration-none text-dark">
                             <p class="mb-0">{{ post.username }}</p>
-                            </a>
+                        </a>
+
                         <span>{{ post.created_at|date:"M d, Y h:i A" }}</span>
                     </div>
+
 
 
                 </div>

@@ -347,13 +347,34 @@ function openModal() {
   document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
 </script>
 <script>
-  function updatePreview(imgElement) {
-    const preview = document.getElementById('mainPreviewImage');
-    if (preview && imgElement.src) {
-      preview.src = imgElement.src;
+  function updatePreview(mediaElement) {
+    const previewContainer = document.getElementById('mainPreviewContainer');
+    previewContainer.innerHTML = ''; // Clear current preview
+
+    if (mediaElement.tagName === 'IMG') {
+      const img = document.createElement('img');
+      img.src = mediaElement.src;
+      img.className = 'img-fluid rounded shadow';
+      img.style.maxHeight = '400px';
+      img.style.objectFit = 'contain';
+      previewContainer.appendChild(img);
+    } else if (mediaElement.tagName === 'VIDEO') {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.className = 'img-fluid rounded shadow';
+      video.style.maxHeight = '400px';
+      video.style.objectFit = 'contain';
+
+      const source = document.createElement('source');
+      source.src = mediaElement.querySelector('source').src;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+
+      previewContainer.appendChild(video);
     }
   }
 </script>
+
 
 </body>
 </html>
