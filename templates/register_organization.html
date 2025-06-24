@@ -16,7 +16,7 @@
   <div class="auth-container">
   <div class="row g-0">
     <div class="col-lg-8 col-md-6 side-panel d-flex flex-column justify-content-center align-items-center rounded">
-      <img src="https://www.dxbnewsnetwork.com/upload/logo/dxb_black.png" alt="Logo" class="login-logo">
+      <img src="{% static 'images/artdomain-logo.png' %}" alt="Logo" class="login-logo">
       <h4 class="fw-bold">Welcome to our community</h4>
       <p class="text-muted">Join us and register your organization today.</p>
     </div>
@@ -87,6 +87,7 @@
     const emailInput = document.querySelector('input[name="email"]');
     const email = emailInput.value;
     const statusMsg = document.getElementById("otp-status");
+    const  BACKEND_URL = "http://127.0.0.1:8001"
 
     if (!email) {
       statusMsg.innerText = "Enter email to send OTP.";
@@ -94,7 +95,7 @@
       return;
     }
 
-    fetch("http://127.0.0.1:8001/organization/send-register-otp/", {
+    fetch(`${BACKEND_URL}/organization/send-register-otp/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

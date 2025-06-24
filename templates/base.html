@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'style3.css' %}">
+      <link rel="icon" href="{% static 'images/favicon.png' %}" type  ="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght
@@ -50,7 +51,7 @@
             </ul>
            
             <div class="nav_user_icon online_icon" onclick="settingsMenuToggle()">
-                <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="profile">
+                <img src="{% if session_profile %}{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="profile">
 
             </div>
         </div>
@@ -63,10 +64,10 @@
             
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="{% if session_profile %}http://127.0.0.1:8001{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
+                    <img src="{% if session_profile %}{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
                     <div>
-                        <p>{{ session_name }}</p>
-                        <a href="{% url 'dashboard' %}">See Your Profile</a>
+                        <p>{{ request.session.username }}</p>
+                        <a href="{% url 'dashboard' %}">See Your Studio</a>
                     </div>
                 </div>
                 <hr />

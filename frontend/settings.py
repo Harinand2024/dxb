@@ -140,3 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 EMAIL_DOMAIL_URL = os.environ.get('EMAIL_DOMAIL_URL', '')
+
+
+
+BACKEND_URL = "http://127.0.0.1:8001"

@@ -6,14 +6,16 @@ from .forms import *
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse
-
+from django.conf import settings 
+BACKEND_URL = settings.BACKEND_URL
 # Create your views here.
 def home(request):
     if not request.session.get('access'):
         return redirect('login')
 
     access_token = request.session.get('access')
-    session_profile= request.session.get('profile_picture')
+    session_profile_path = request.session.get('profile_picture')
+    session_profile = f"{BACKEND_URL}/media/{session_profile_path}" if session_profile_path else None
     session_name = request.session.get('username')
     profile_id = request.session.get('profile_id')
 
@@ -24,16 +26,16 @@ def home(request):
     headers = {'Authorization': f'Bearer {access_token}'}
 
     # Fetch posts
-    response = requests.get('http://127.0.0.1:8001/media/all-posts/', headers=headers)
+    response = requests.get(f'{BACKEND_URL}/media/all-posts/', headers=headers)
     posts = []
     if response.status_code == 200:
         posts = response.json().get('data', [])
         for post in posts:
             post['media'] = [
-                f"http://127.0.0.1:8001{m['file']}" for m in post.get('media', [])
+                f"{BACKEND_URL}{m['file']}" for m in post.get('media', [])
             ]
             post['profile_picture'] = (
-                f"http://127.0.0.1:8001/media/{post['profile_picture']}"
+                f"{BACKEND_URL}/media/{post['profile_picture']}"
                 if post.get('profile_picture')
                 else '/static/images/profile.png'
             )
@@ -41,7 +43,7 @@ def home(request):
     # Fetch profile data
     profile_data = {}
     try:
-        profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
+        profile_url = f'{BACKEND_URL}/profile/profile/{profile_id}/'
         profile_response = requests.get(profile_url, headers=headers)
         if profile_response.status_code == 200:
             profile_data = profile_response.json().get('data', {})
@@ -74,7 +76,7 @@ def login_page_view(request):
                 password = form.cleaned_data['password']
 
                 # API call to login endpoint
-                url = "http://127.0.0.1:8001/user/login/"
+                url = f"{BACKEND_URL}/user/login/"
                 payload = {'email': email, 'password': password}
                 response = requests.post(url, data=payload)
                 result = response.json()
@@ -85,6 +87,7 @@ def login_page_view(request):
                     request.session['access'] = data.get('access')
                     request.session['refresh'] = data.get('refresh')
                     request.session['profile_id'] = data.get('profile_id')
+                    request.session['profile_picture'] = data.get('profile_picture')
                     request.session['username'] = data.get('username')
                     request.session['email'] = data.get('email')
                     request.session['profile_type'] = data.get('profile_type')
@@ -125,11 +128,11 @@ def dashboard_view(request):
         return redirect('login')
 
     access_token = request.session.get('access')
-    session_profile= request.session.get('profile_picture')
+    session_profile_path = request.session.get('profile_picture')
+    session_profile = f"{BACKEND_URL}/media/{session_profile_path}" if session_profile_path else None
     session_name = request.session.get('username')
     profile_id = request.session.get('profile_id')
-    session_data = dict(request.session)
-    print(session_data)
+
 
     if not profile_id:
         messages.error(request, "Profile ID not found.")
@@ -140,7 +143,7 @@ def dashboard_view(request):
     # Fetch profile data
     profile_data = {}
     try:
-        profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
+        profile_url = f'{BACKEND_URL}/profile/profile/{profile_id}/'
         profile_response = requests.get(profile_url, headers=headers)
         if profile_response.status_code == 200:
             profile_data = profile_response.json().get('data', {})
@@ -157,7 +160,7 @@ def dashboard_view(request):
 
     intro_sections = []
     try:
-        profile_url = f'http://127.0.0.1:8001/profile/profile/{profile_id}/'
+        profile_url = f'{BACKEND_URL}/profile/profile/{profile_id}/'
         profile_response = requests.get(profile_url, headers=headers)
         if profile_response.status_code == 200:
             profile_json = profile_response.json().get('data', {})
@@ -179,7 +182,7 @@ def dashboard_view(request):
 
     posts = []
     try:
-        posts_url = f'http://127.0.0.1:8001/media/profile-posts/profile-id/{profile_id}/'  # ← use f-string here
+        posts_url = f'{BACKEND_URL}/media/profile-posts/profile-id/{profile_id}/'  # ← use f-string here
         posts_response = requests.get(posts_url, headers=headers)
         if posts_response.status_code == 200:
             posts_data = posts_response.json().get('data', [])
@@ -191,7 +194,7 @@ def dashboard_view(request):
                     "created_at": post.get('created_at'),
                     "title": post.get('title'),
                     "caption": post.get('caption'),
-                    "media": [f"http://127.0.0.1:8001{m.get('file')}" for m in post.get('media', [])],  # Media URLs
+                    "media": [f"{BACKEND_URL}{m.get('file')}" for m in post.get('media', [])],  # Media URLs
                     "reaction_count": post.get('reaction_count', 0),
                     "comment_count": post.get('comment_count', 0),
                     "share_count": post.get('share_count', 0),
@@ -204,35 +207,35 @@ def dashboard_view(request):
 
     photos = []
     try:
-        photos_url = f'http://127.0.0.1:8001/media/profile-images/profile-id/{profile_id}/'
+        photos_url = f'{BACKEND_URL}/media/profile-images/profile-id/{profile_id}/'
         photos_response = requests.get(photos_url, headers=headers)
         if photos_response.status_code == 200:
             photos_data = photos_response.json().get('data', [])
             for item in photos_data:
                 file_url = item.get('file')
                 if file_url:
-                    photos.append(f"http://127.0.0.1:8001{file_url}")
+                    photos.append(f"{BACKEND_URL}{file_url}")
         else:
             print("Photo fetch failed:", photos_response.status_code)
     except Exception as e:
         print("Photo fetch error:", str(e))
     canvas_images = []
     try:
-        canvas_url = f'http://127.0.0.1:8001/profile/canvas/{profile_id}/'
+        canvas_url = f'{BACKEND_URL}/profile/canvas/{profile_id}/'
         canvas_response = requests.get(canvas_url, headers=headers)
         if canvas_response.status_code == 200:
             canvas_data = canvas_response.json().get('data', [])
             for item in canvas_data:
                 image_url = item.get('image')
                 if image_url:
-                    canvas_images.append(f"http://127.0.0.1:8001{image_url}")
+                    canvas_images.append(f"{BACKEND_URL}{image_url}")
         else:
             print("Canvas fetch failed:", canvas_response.status_code)
     except Exception as e:
         print("Canvas fetch error:", str(e))
     friends = []
     try:
-        friends_url = f'http://127.0.0.1:8001/profile/friends-list/{profile_id}/'
+        friends_url = f'{BACKEND_URL}/profile/friends-list/{profile_id}/'
         friends_response = requests.get(friends_url, headers=headers)
         if friends_response.status_code == 200:
             friends_data = friends_response.json().get('data', [])
@@ -240,7 +243,7 @@ def dashboard_view(request):
                 friends.append({
                     'id': friend.get('id'),
                     'name': friend.get('username'),
-                    'image': f"http://127.0.0.1:8001{friend.get('profile_picture')}" if friend.get('profile_picture') else '/static/images/profile-pic.png'
+                    'image': f"{BACKEND_URL}{friend.get('profile_picture')}" if friend.get('profile_picture') else '/static/images/profile-pic.png'
                 })
         else:
             print("Friend list fetch failed:", friends_response.status_code)
@@ -279,7 +282,7 @@ def register_organization_view(request):
                 "phone_number": data['phone_number'],
             }
 
-            response = requests.post('http://127.0.0.1:8001/organization/register-organization/', json=payload)
+            response = requests.post(f'{BACKEND_URL}/organization/register-organization/', json=payload)
 
             if response.status_code == 201:
                 messages.success(request, "Organization registered successfully.")
@@ -319,7 +322,7 @@ def add_profile_field(request):
             if file:
                 files['file_value'] = file
 
-        url = f"http://127.0.0.1:8001/profile/profile-fields/{profile_id}/"
+        url = f"{BACKEND_URL}/profile/profile-fields/{profile_id}/"
         headers = {'Authorization': f'Bearer {access_token}'}
 
         response = requests.post(url, headers=headers, data=data, files=files)
@@ -336,7 +339,7 @@ def create_post_view(request):
             messages.error(request, "Access token missing. Please login again.")
             return redirect('login')
 
-        url = 'http://127.0.0.1:8001/media/post/'
+        url = f'{BACKEND_URL}/media/post/'
         headers = {'Authorization': f'Bearer {access_token}'}
 
         files = request.FILES.getlist('media_files')
@@ -372,14 +375,15 @@ def reset_password_page(request):
 def profile_dashboard_view(request, profile_id):
     access_token = request.session.get('access')
     session_name = request.session.get('username')
-    session_profile= request.session.get('profile_picture')
-    session_data = dict(request.session)
+    session_profile_path = request.session.get('profile_picture')
+    session_profile = f"{BACKEND_URL}/media/{session_profile_path}" if session_profile_path else None
+
 
     if not access_token:
         return JsonResponse({'error': 'Authentication required'}, status=401)
 
     headers = {'Authorization': f'Bearer {access_token}'}
-    base_url = 'http://127.0.0.1:8001'
+    base_url = f'{BACKEND_URL}'
 
     data = {
         'profile': {},
@@ -454,21 +458,21 @@ def profile_dashboard_view(request, profile_id):
         print(f"Photo fetch error: {e}")
     canvas_images = []
     try:
-        canvas_url = f'http://127.0.0.1:8001/profile/canvas/{profile_id}/'
+        canvas_url = f'{BACKEND_URL}/profile/canvas/{profile_id}/'
         canvas_response = requests.get(canvas_url, headers=headers)
         if canvas_response.status_code == 200:
             canvas_data = canvas_response.json().get('data', [])
             for item in canvas_data:
                 image_url = item.get('image')
                 if image_url:
-                    canvas_images.append(f"http://127.0.0.1:8001{image_url}")
+                    canvas_images.append(f"{BACKEND_URL}{image_url}")
         else:
             print("Canvas fetch failed:", canvas_response.status_code)
     except Exception as e:
         print("Canvas fetch error:", str(e))
     friends = []
     try:
-        friends_url = f'http://127.0.0.1:8001/profile/friends-list/{profile_id}/'
+        friends_url = f'{BACKEND_URL}/profile/friends-list/{profile_id}/'
         friends_response = requests.get(friends_url, headers=headers)
         if friends_response.status_code == 200:
             friends_data = friends_response.json().get('data', [])
@@ -476,7 +480,7 @@ def profile_dashboard_view(request, profile_id):
                 friends.append({
                     'id': friend.get('id'),
                     'name': friend.get('username'),
-                    'image': f"http://127.0.0.1:8001{friend.get('profile_pic')}" if friend.get('profile_pic') else '/static/images/profile-pic.png'
+                    'image': f"{BACKEND_URL}/{friend.get('profile_picture')}" if friend.get('profile_picture') else '/static/images/profile-pic.png'
                 })
         else:
             print("Friend list fetch failed:", friends_response.status_code)
@@ -502,14 +506,14 @@ def gallery_view(request, profile_id):
 
     photos = []
     try:
-        url = f'http://127.0.0.1:8001/media/profile-images/profile-id/{profile_id}/'
+        url = f'{BACKEND_URL}/media/profile-images/profile-id/{profile_id}/'
         res = requests.get(url, headers=headers)
         if res.status_code == 200:
             photos_data = res.json().get('data', [])
             for item in photos_data:
                 file_url = item.get('file')
                 if file_url:
-                    photos.append(f"http://127.0.0.1:8001{file_url}")
+                    photos.append(f"{BACKEND_URL}{file_url}")
     except Exception as e:
         print("Gallery fetch error:", str(e))
 

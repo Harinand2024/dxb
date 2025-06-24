@@ -248,7 +248,7 @@
 
 
             <button type="button" class="btn btn-primary-art d-flex align-items-center rounded-pill">
-                <i class="fas fa-envelope me-2"></i> Message
+                <i class="fas fa-envelope me-2"></i> Signal
             </button>
         </div>
     </div>
@@ -388,20 +388,20 @@
 
                     <div class="modal-body">
                         {% if friends %}
-                        
                         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
                             {% for friend in friends %}
-                            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
-                                {% for friend in friends %}
-                                <div class="col text-center d-flex flex-column align-items-center">
-                                    <img src="{{ friend.image }}" class="rounded-circle shadow-sm"
-                                        alt="{{ friend.name }}" width="80" height="80">
-                                    <a href="{% url 'profile-dashboard-api' friend.id %}"
-                                        class="text-decoration-none text-dark">
-                                        <p class="mt-2 fw-medium">{{ friend.name }}</p>
-                                    </a>
-                                </div>
-                                {% endfor %}
+                            <div class="col text-center d-flex flex-column align-items-center">
+                                <img src="{{ friend.image }}" class="rounded-circle shadow-sm" alt="{{ friend.name }}"
+                                    width="80" height="80">
+                                {% if friend.id == request.session.profile_id %}
+                                {% url 'dashboard' as profile_url %}
+                                {% else %}
+                                {% url 'profile-dashboard-api' friend.profile as profile_url %}
+                                {% endif %}
+                                <a href="{{ profile_url }}"
+                                    class="text-decoration-none text-dark">
+                                    <p class="mt-2 fw-medium">{{ friend.name }}</p>
+                                </a>
                             </div>
                             {% endfor %}
                         </div>
@@ -484,7 +484,7 @@
         }
 
         try {
-            const response = await fetch('http://127.0.0.1:8001/profile/send-friend-request/', {
+            const response = await fetch(`${BACKEND_URL}/profile/send-friend-request/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -533,7 +533,34 @@
     });
 
 </script>
+<script>
+  function updatePreview(mediaElement) {
+    const previewContainer = document.getElementById('mainPreviewContainer');
+    previewContainer.innerHTML = ''; // Clear current preview
 
+    if (mediaElement.tagName === 'IMG') {
+      const img = document.createElement('img');
+      img.src = mediaElement.src;
+      img.className = 'img-fluid rounded shadow';
+      img.style.maxHeight = '400px';
+      img.style.objectFit = 'contain';
+      previewContainer.appendChild(img);
+    } else if (mediaElement.tagName === 'VIDEO') {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.className = 'img-fluid rounded shadow';
+      video.style.maxHeight = '400px';
+      video.style.objectFit = 'contain';
+
+      const source = document.createElement('source');
+      source.src = mediaElement.querySelector('source').src;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+
+      previewContainer.appendChild(video);
+    }
+  }
+</script>
 
 
 

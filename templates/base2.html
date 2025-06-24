@@ -13,8 +13,7 @@
 <script src="{% static 'js/into.js' %}"></script>
 <script src="{% static 'js/script.js' %}"></script>
 <script>
-let cropper;
-
+  let  BACKEND_URL = "http://127.0.0.1:8001";
 document.addEventListener("DOMContentLoaded", function () {
   const uploadBtn = document.getElementById("uploadBtn");
   const coverUpload = document.getElementById("coverUpload");
@@ -22,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const confirmCropBtn = document.getElementById("confirmCropBtn");
   const cropModalEl = document.getElementById("coverCropModal");
   const cropModal = new bootstrap.Modal(cropModalEl);
+  let cropper;
 
   if (uploadBtn && coverUpload) {
     // Open file dialog
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const accessToken = "{{ request.session.access }}";
 
-        fetch("http://127.0.0.1:8001/profile/canvas/", {
+        fetch(`${BACKEND_URL}//profile/canvas/`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${accessToken}`
@@ -115,7 +115,7 @@ function openModal() {
     list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
 
     try {
-      const res = await fetch("http://127.0.0.1:8001/profile/pending-friend-requests/", {
+      const res = await fetch(`${BACKEND_URL}//profile/pending-friend-requests/`, {
         headers: {
           "Authorization": "Bearer {{ request.session.access }}",
         }
@@ -135,7 +135,7 @@ function openModal() {
 
         li.innerHTML = `
           <div class="d-flex align-items-center gap-2">
-            <img src="http://127.0.0.1:8001${req.from_profile_pic}" alt="Profile" />
+            <img src="${BACKEND_URL}${req.from_profile_pic}" alt="Profile" />
             <span>${req.from_username}</span>
           </div>
           <div class="btn-group btn-group-sm">
@@ -161,7 +161,7 @@ function openModal() {
 
   async function respondFriendRequest(requestId, action) {
     try {
-      const response = await fetch("http://127.0.0.1:8001/profile/respond-friend-request/", {
+      const response = await fetch(`${BACKEND_URL}//profile/respond-friend-request/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -181,7 +181,7 @@ function openModal() {
 
   async function cancelFriendRequest(requestId) {
     try {
-      const response = await fetch("http://127.0.0.1:8001/profile/cancel-friend-request/", {
+      const response = await fetch(`${BACKEND_URL}//profile/cancel-friend-request/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +227,7 @@ function openModal() {
 
       const accessToken = '{{ request.session.access }}';
 
-      fetch('http://127.0.0.1:8001/profile/canvas/', {
+      fetch(`${BACKEND_URL}/profile/canvas/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -260,7 +260,7 @@ function openModal() {
     list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
 
     try {
-      const res = await fetch("http://127.0.0.1:8001/profile/pending-friend-requests/", {
+      const res = await fetch(`${BACKEND_URL}/profile/pending-friend-requests/`, {
         headers: {
           "Authorization": "Bearer {{ request.session.access }}",
         }
@@ -280,7 +280,7 @@ function openModal() {
 
         li.innerHTML = `
           <div class="d-flex align-items-center gap-2">
-            <img src="{% if req.from_profile_pic %}http://127.0.0.1:8001{{ req.from_profile_pic }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile">
+            <img src="{% if req.from_profile_pic %}${BACKEND_URL}{{ req.from_profile_pic }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile">
 
             <span>${req.from_username}</span>
           </div>
@@ -307,7 +307,7 @@ function openModal() {
 
   async function respondFriendRequest(requestId, action) {
     try {
-      const response = await fetch("http://127.0.0.1:8001/profile/respond-friend-request/", {
+      const response = await fetch(`${BACKEND_URL}//profile/respond-friend-request/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -327,7 +327,7 @@ function openModal() {
 
   async function cancelFriendRequest(requestId) {
     try {
-      const response = await fetch("http://127.0.0.1:8001/profile/cancel-friend-request/", {
+      const response = await fetch(`${BACKEND_URL}/profile/cancel-friend-request/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

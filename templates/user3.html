@@ -418,7 +418,7 @@
         list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
 
         try {
-            const res = await fetch("http://127.0.0.1:8001/profile/pending-friend-requests/", {
+            const res = await fetch(`${BACKEND_URL}/profile/pending-friend-requests/`, {
                 headers: {
                     "Authorization": "Bearer {{ request.session.access }}",
                 }
@@ -438,7 +438,7 @@
 
                 li.innerHTML = `
           <div class="d-flex align-items-center gap-2">
-            <img src="http://127.0.0.1:8001${req.from_profile_pic}" alt="Profile" />
+            <img src="${BACKEND_URL}${req.from_profile_pic}" alt="Profile" />
             <span>${req.from_username}</span>
           </div>
           <div class="btn-group btn-group-sm">
@@ -463,7 +463,7 @@
 
     async function respondFriendRequest(requestId, action) {
         try {
-            const response = await fetch("http://127.0.0.1:8001/profile/respond-friend-request/", {
+            const response = await fetch(`${BACKEND_URL}/profile/respond-friend-request/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -483,7 +483,7 @@
 
     async function cancelFriendRequest(requestId) {
         try {
-            const response = await fetch("http://127.0.0.1:8001/profile/cancel-friend-request/", {
+            const response = await fetch(`${BACKEND_URL}/profile/cancel-friend-request/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

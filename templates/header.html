@@ -191,7 +191,7 @@
               </ul>
             </div>
           <div class="nav_user_icon position-relative" onclick="settingsMenuToggle()" style="cursor: pointer;">
-            <img src="{% if session_profile %}http://127.0.0.1:8001/media/{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" class="rounded-circle shadow-sm"
+            <img src="{% if session_profile %}{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" class="rounded-circle shadow-sm"
               alt="Profile" style="height: 40px; width: 40px; object-fit: cover;">
             <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white"
               style="width: 10px; height: 10px;"></span>
@@ -207,7 +207,7 @@
 
             <div class="settings_menu_inner">
                 <div class="user_profile">
-                    <img src="{% if session_profile %}http://127.0.0.1:8001/media/{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
+                    <img src="{% if session_profile %}{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Pro We Are Pro You Now">
                     <div>
                         <p>{%if profile.username %}{{profile.username}}{%else%} Artist Name{%endif%}</p>
                         <a href="{% url 'dashboard' %}">See Your Profile</a>
@@ -368,7 +368,7 @@
           formData.append('csrfmiddlewaretoken', csrfToken);
         }
 
-        fetch(`http://127.0.0.1:8001/profile/profile/${profileId}/`, {
+        fetch(`${BACKEND_URL}/profile/profile/${profileId}/`, {
           method: 'PUT',
           headers: {
             'X-Requested-With': 'XMLHttpRequest',

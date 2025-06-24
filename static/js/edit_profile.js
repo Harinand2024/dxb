@@ -2,6 +2,7 @@ let cropper = null;
 let currentCropType = null;
 // let accessToken = profile_container.dataset.accessToken;
 let accessToken = null; // Global access token placeholder
+let  BACKEND_URL = "http://127.0.0.1:8001";
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const uploadUrl = `http://127.0.0.1:8001/profile/profile/${profileId}/`;
+        const uploadUrl = `${BACKEND_URL}/profile/profile/${profileId}/`;
 
         const headers = {
             'Authorization': `Bearer ${accessToken}`,
@@ -496,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers['X-CSRFToken'] = csrfToken;
             }
 
-            fetch(`http://127.0.0.1:8001/profile/profile/${profileId}/`, {
+            fetch(`${BACKEND_URL}/profile/profile/${profileId}/`, {
                 method: 'PUT',
                 body: formData,
                 headers: headers,
@@ -642,7 +643,7 @@ function updateIntroSectionTitle(el) {
   const displayOrder = parseInt(sectionDiv.dataset.displayOrder, 10) || Date.now() % 10000;
   const newTitle = el.textContent.trim();
 
-  fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields-section/${sectionId}/`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -691,7 +692,7 @@ function addIntroField(btn) {
     ]
   };
 
-  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields/${profileId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -726,7 +727,7 @@ function removeIntroField(btn) {
   }
 
   // Send DELETE request
-  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields/${profileId}/`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -764,7 +765,7 @@ function removeSectionField(btn) {
   }
 
   // DELETE section by ID (no body required)
-  fetch(`http://127.0.0.1:8001/profile/profile-fields-section/${sectionId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields-section/${sectionId}/`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${accessToken}`
@@ -817,7 +818,7 @@ function saveFields(sectionDiv) {
     // fields
   };
 
-  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields/${profileId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -850,7 +851,7 @@ function addNewIntroSection() {
     fields: []
   };
 
-  fetch(`http://127.0.0.1:8001/profile/profile-fields/${profileId}/`, {
+  fetch(`${BACKEND_URL}/profile/profile-fields/${profileId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -881,7 +882,7 @@ const accessToken = document.getElementById('introContainer')?.dataset.accessTok
 
   if (!confirm('Are you sure you want to delete this post?')) return;
 
-  fetch(`http://127.0.0.1:8001/media/post/${postId}/`, {
+  fetch(`${BACKEND_URL}/media/post/${postId}/`, {
     method: 'DELETE',
     headers: {
       'Authorization': `Bearer ${accessToken}`
