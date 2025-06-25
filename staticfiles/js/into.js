@@ -1,0 +1,343 @@
+let  BACKEND_URL = "http://127.0.0.1:8001";
+document.addEventListener("DOMContentLoaded", function () {
+  const uploadBtn = document.getElementById("uploadBtn");
+  const coverUpload = document.getElementById("coverUpload");
+  const cropImage = document.getElementById("coverCropImage");
+  const confirmCropBtn = document.getElementById("confirmCropBtn");
+  const cropModalEl = document.getElementById("coverCropModal");
+  const cropModal = new bootstrap.Modal(cropModalEl);
+  let cropper;
+
+  if (uploadBtn && coverUpload) {
+    // Open file dialog
+    uploadBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      coverUpload.click();
+    });
+
+    // Handle file change
+    coverUpload.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        cropImage.src = evt.target.result;
+
+        cropImage.onload = function () {
+          if (cropper) cropper.destroy();
+
+          cropper = new Cropper(cropImage, {
+            aspectRatio: 16 / 9,
+            viewMode: 1,
+            autoCropArea: 1,
+            cropBoxResizable: false,
+            movable: true,
+            zoomable: true,
+            background: false,
+          });
+
+          cropModal.show();
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Confirm crop and upload
+    confirmCropBtn.addEventListener("click", function () {
+      if (!cropper) return;
+
+      cropper.getCroppedCanvas().toBlob(function (blob) {
+        const formData = new FormData();
+        formData.append("image", blob, "canvas_cropped.jpg");
+
+        const accessToken = "{{ request.session.access }}";
+
+        fetch(`${BACKEND_URL}//profile/canvas/`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: formData,
+          credentials: "include"
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status) {
+              alert("Image uploaded successfully!");
+              location.reload();
+            } else {
+              alert("Upload failed.");
+            }
+          })
+          .catch(err => {
+            console.error("Upload error:", err);
+            alert("Something went wrong.");
+          });
+
+        cropModal.hide();
+      }, "image/jpeg");
+    });
+  }
+});
+function openModal() {
+    document.getElementById('postModal').classList.remove('hidden');
+    document.getElementById('postModal').classList.add('flex');
+    }
+
+    function closeModal() {
+        document.getElementById('postModal').classList.add('hidden');
+    }
+  async function fetchPendingRequests() {
+    const list = document.getElementById("friendRequestsList");
+    list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
+
+    try {
+      const res = await fetch(`${BACKEND_URL}//profile/pending-friend-requests/`, {
+        headers: {
+          "Authorization": "Bearer {{ request.session.access }}",
+        }
+      });
+      const result = await res.json();
+
+      if (!result.status || result.data.length === 0) {
+        list.innerHTML = '<li class="text-muted px-3">No friend requests</li>';
+        return;
+      }
+
+      list.innerHTML = "";
+
+      result.data.forEach(req => {
+        const li = document.createElement("li");
+        li.classList.add("friend-request-item");
+
+        li.innerHTML = `
+          <div class="d-flex align-items-center gap-2">
+            <img src="${BACKEND_URL}${req.from_profile_pic}" alt="Profile" />
+            <span>${req.from_username}</span>
+          </div>
+          <div class="btn-group btn-group-sm">
+            ${
+              req.is_sent_by_current_user
+                ? `<button class="btn btn-warning" onclick="cancelFriendRequest(${req.id})">Cancel</button>`
+                : `
+                  <button class="btn btn-success" onclick="respondFriendRequest(${req.id}, 'accept')">✓</button>
+                  <button class="btn btn-danger" onclick="respondFriendRequest(${req.id}, 'reject')">✕</button>
+                `
+            }
+          </div>
+        `;
+
+        list.appendChild(li);
+      });
+
+    } catch (err) {
+      console.error("Failed to fetch requests", err);
+      list.innerHTML = '<li class="text-danger px-3">Error loading requests</li>';
+    }
+  }
+
+  async function respondFriendRequest(requestId, action) {
+    try {
+      const response = await fetch(`${BACKEND_URL}//profile/respond-friend-request/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer {{ request.session.access }}"
+        },
+        body: JSON.stringify({ request_id: requestId, action: action })
+      });
+
+      const result = await response.json();
+      alert(result.status ? `Request ${action}ed.` : result.message);
+      fetchPendingRequests();
+    } catch (err) {
+      console.error("Respond error:", err);
+      alert("Something went wrong.");
+    }
+  }
+
+  async function cancelFriendRequest(requestId) {
+    try {
+      const response = await fetch(`${BACKEND_URL}//profile/cancel-friend-request/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer {{ request.session.access }}"
+        },
+        body: JSON.stringify({ request_id: requestId })
+      });
+
+      const result = await response.json();
+      alert(result.status ? "Friend request canceled." : result.message);
+      fetchPendingRequests();
+    } catch (err) {
+      console.error("Cancel error:", err);
+      alert("Something went wrong.");
+    }
+  }
+
+  document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
+ document.addEventListener("DOMContentLoaded", function () {
+  const uploadBtn = document.getElementById("uploadBtn");
+  const coverUpload = document.getElementById("coverUpload");
+
+  if (uploadBtn && coverUpload) {
+    uploadBtn.addEventListener("click", function (e) {
+      e.stopPropagation(); // Prevent carousel interference
+      coverUpload.click();
+    });
+
+    coverUpload.addEventListener("change", function (e) {
+      const files = e.target.files;
+      if (!files.length) return;
+
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('image', files[i]);
+      }
+
+      const accessToken = '{{ request.session.access }}';
+
+      fetch(`${BACKEND_URL}/profile/canvas/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: formData,
+        credentials: 'include'
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status) {
+          alert("Images uploaded successfully!");
+          location.reload();
+        } else {
+          alert("Upload failed.");
+        }
+      })
+      .catch(err => {
+        console.error("Upload error:", err);
+        alert("Something went wrong.");
+      });
+    });
+  }
+});
+  async function fetchPendingRequests() {
+    const list = document.getElementById("friendRequestsList");
+    list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/profile/pending-friend-requests/`, {
+        headers: {
+          "Authorization": "Bearer {{ request.session.access }}",
+        }
+      });
+      const result = await res.json();
+
+      if (!result.status || result.data.length === 0) {
+        list.innerHTML = '<li class="text-muted px-3">No friend requests</li>';
+        return;
+      }
+
+      list.innerHTML = "";
+
+      result.data.forEach(req => {
+        const li = document.createElement("li");
+        li.classList.add("friend-request-item");
+
+        li.innerHTML = `
+          <div class="d-flex align-items-center gap-2">
+            <img src="{% if req.from_profile_pic %}${BACKEND_URL}{{ req.from_profile_pic }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile">
+
+            <span>${req.from_username}</span>
+          </div>
+          <div class="btn-group btn-group-sm">
+            ${
+              req.is_sent_by_current_user
+                ? `<button class="btn btn-warning" onclick="cancelFriendRequest(${req.id})">Cancel</button>`
+                : `
+                  <button class="btn btn-success" onclick="respondFriendRequest(${req.id}, 'accept')">✓</button>
+                  <button class="btn btn-danger" onclick="respondFriendRequest(${req.id}, 'reject')">✕</button>
+                `
+            }
+          </div>
+        `;
+
+        list.appendChild(li);
+      });
+
+    } catch (err) {
+      console.error("Failed to fetch requests", err);
+      list.innerHTML = '<li class="text-danger px-3">Error loading requests</li>';
+    }
+  }
+
+  async function respondFriendRequest(requestId, action) {
+    try {
+      const response = await fetch(`${BACKEND_URL}//profile/respond-friend-request/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer {{ request.session.access }}"
+        },
+        body: JSON.stringify({ request_id: requestId, action: action })
+      });
+
+      const result = await response.json();
+      alert(result.status ? `Request ${action}ed.` : result.message);
+      fetchPendingRequests();
+    } catch (err) {
+      console.error("Respond error:", err);
+      alert("Something went wrong.");
+    }
+  }
+
+  async function cancelFriendRequest(requestId) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/profile/cancel-friend-request/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer {{ request.session.access }}"
+        },
+        body: JSON.stringify({ request_id: requestId })
+      });
+
+      const result = await response.json();
+      alert(result.status ? "Friend request canceled." : result.message);
+      fetchPendingRequests();
+    } catch (err) {
+      console.error("Cancel error:", err);
+      alert("Something went wrong.");
+    }
+  }
+
+  document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
+function updatePreview(mediaElement) {
+  const previewContainer = document.getElementById("mainPreviewContainer");
+  previewContainer.innerHTML = ""; // Clear current preview
+
+  if (mediaElement.tagName === "IMG") {
+    const img = document.createElement("img");
+    img.src = mediaElement.src;
+    img.className = "img-fluid rounded shadow";
+    img.style.maxHeight = "400px";
+    img.style.objectFit = "contain";
+    previewContainer.appendChild(img);
+  } else if (mediaElement.tagName === "VIDEO") {
+    const video = document.createElement("video");
+    video.controls = true;
+    video.className = "img-fluid rounded shadow";
+    video.style.maxHeight = "400px";
+    video.style.objectFit = "contain";
+
+    const source = document.createElement("source");
+    source.src = mediaElement.querySelector("source").src;
+    source.type = "video/mp4";
+    video.appendChild(source);
+
+    previewContainer.appendChild(video);
+  }
+}

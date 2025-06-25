@@ -902,5 +902,4 @@ const accessToken = document.getElementById('introContainer')?.dataset.accessTok
     alert('Error deleting post');
   });
 }
-console.log("postId:", postId);
-console.log("accessToken:", accessToken);
+

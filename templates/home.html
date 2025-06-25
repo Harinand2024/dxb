@@ -48,10 +48,11 @@
         </div> -->
 
         <div class="post_container">
-            <div class="user_profile">
+            <div class="user_profile mb-2">
                 <img src="{% if session_profile %}{{ session_profile }}{% else %}{% static 'images/profile.png' %}{% endif %}" alt="Profile Picture">
                 <div>
-                    <p>{{ session_name }}</p>
+
+                    <a href="{% url 'dashboard' %}"><p>{{ session_name }}</p></a>
                     <small>Public <i class="fa fa-caret-down"></i></small>
                 </div>
             </div>
@@ -243,114 +244,6 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<script src="{% static 'js/edit_profile.js' %}"></script>
-<script src="{% static 'js/into.js' %}"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="{% static 'js/script.js' %}"></script>
 
-<script>
-    let  BACKEND_URL = "http://127.0.0.1:8001";
-    function openModal() {
-        document.getElementById('postModal').classList.remove('hidden');
-        document.getElementById('postModal').classList.add('flex');
-    }
-
-    function closeModal() {
-        document.getElementById('postModal').classList.add('hidden');
-    }
-</script>
-<script>
-    async function fetchPendingRequests() {
-        const list = document.getElementById("friendRequestsList");
-        list.innerHTML = '<li class="text-muted px-3">Loading...</li>';
-
-        try {
-            const res = await fetch(`${BACKEND_URL}/profile/pending-friend-requests/`, {
-                headers: {
-                    "Authorization": "Bearer {{ request.session.access }}",
-                }
-            });
-            const result = await res.json();
-
-            if (!result.status || result.data.length === 0) {
-                list.innerHTML = '<li class="text-muted px-3">No friend requests</li>';
-                return;
-            }
-
-            list.innerHTML = "";
-
-            result.data.forEach(req => {
-                const li = document.createElement("li");
-                li.classList.add("friend-request-item");
-
-                li.innerHTML = `
-          <div class="d-flex align-items-center gap-2">
-            <img src="${BACKEND_URL}${req.from_profile_pic}" alt="Profile" />
-            <span>${req.from_username}</span>
-          </div>
-          <div class="btn-group btn-group-sm">
-            ${req.is_sent_by_current_user
-                        ? `<button class="btn btn-warning" onclick="cancelFriendRequest(${req.id})">Cancel</button>`
-                        : `
-                  <button class="btn btn-success" onclick="respondFriendRequest(${req.id}, 'accept')">✓</button>
-                  <button class="btn btn-danger" onclick="respondFriendRequest(${req.id}, 'reject')">✕</button>
-                `
-                    }
-          </div>
-        `;
-
-                list.appendChild(li);
-            });
-
-        } catch (err) {
-            console.error("Failed to fetch requests", err);
-            list.innerHTML = '<li class="text-danger px-3">Error loading requests</li>';
-        }
-    }
-
-    async function respondFriendRequest(requestId, action) {
-        try {
-            const response = await fetch(`${BACKEND_URL}/profile/respond-friend-request/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer {{ request.session.access }}"
-                },
-                body: JSON.stringify({ request_id: requestId, action: action })
-            });
-
-            const result = await response.json();
-            alert(result.status ? `Request ${action}ed.` : result.message);
-            fetchPendingRequests();
-        } catch (err) {
-            console.error("Respond error:", err);
-            alert("Something went wrong.");
-        }
-    }
-
-    async function cancelFriendRequest(requestId) {
-        try {
-            const response = await fetch(`${BACKEND_URL}/profile/cancel-friend-request/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer {{ request.session.access }}"
-                },
-                body: JSON.stringify({ request_id: requestId })
-            });
-
-            const result = await response.json();
-            alert(result.status ? "Friend request canceled." : result.message);
-            fetchPendingRequests();
-        } catch (err) {
-            console.error("Cancel error:", err);
-            alert("Something went wrong.");
-        }
-    }
-
-    document.getElementById("friendsDropdownBtn")?.addEventListener("click", fetchPendingRequests);
-</script>
 
 {% endblock %}

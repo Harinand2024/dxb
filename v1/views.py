@@ -147,6 +147,9 @@ def dashboard_view(request):
         profile_response = requests.get(profile_url, headers=headers)
         if profile_response.status_code == 200:
             profile_data = profile_response.json().get('data', {})
+            profile_data.update(profile_json)
+            request.session['username'] = profile_data.get('username', request.session.get('username'))
+            request.session['profile_picture'] = profile_data.get('profile_picture', request.session.get('profile_picture'))
         else:
             messages.error(request, "Failed to fetch profile data.")
     except Exception as e:

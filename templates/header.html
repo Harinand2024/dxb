@@ -99,7 +99,8 @@
                     <div class="mb-3">
                       <label for="visibility_status" class="form-label">Visibility</label>
                       <select name="visibility_status" class="form-select">
-
+                        <option value="public" {% if profile.visibility_status == 'public' %}selected{% endif %}>Public</option>
+                        <option value="private" {% if profile.visibility_status == 'private' %}selected{% endif %}>Private</option>
                       </select>
 
                     </div>

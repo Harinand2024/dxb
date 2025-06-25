@@ -7,3 +7,9 @@ requests==2.32.3
 sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.4.0
+
+
+
+
+# the js are included in the static files and the file name was into.js and  edit prfoile.js
+#and the some js in the html files but they need to be change they are local received
